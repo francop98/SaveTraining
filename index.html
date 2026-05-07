@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SaveTraining</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="app">
+<header>
+    <div class="logo">REGISTRO DE<span><br>ENTRENAMIENTO</span></div>
+    <div class="header-stat">
+    <div class="count" id="totalDays">0</div>
+    <div class="label">Días entrenados</div>
+    </div>
+</header>
+
+<div class="stats-bar">
+    <div class="stat-pill">
+    <div class="val" id="statExercises">0</div>
+    <div class="lbl">Ejercicios hoy</div>
+    </div>
+    <div class="stat-pill">
+    <div class="val" id="statSets">0</div>
+    <div class="lbl">Series hoy</div>
+    </div>
+    <div class="stat-pill">
+    <div class="val" id="statWeight">0kg</div>
+    <div class="lbl">Peso total hoy</div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="card">
+    <div class="section-title">Semana de entrenamiento</div>
+    <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Lun</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Mar</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Mié</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Jue</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Vie</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Sáb</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+    <div class="cal-day">
+        <div class="day-name">Dom</div>
+        <div class="day-number">--</div>
+        <div class="day-status">Sin entrenar</div>
+    </div>
+
+</div>
+
+    <div class="card">
+    <div class="section-title">Añadir Ejercicio</div>
+
+    <div class="form-group">
+        <label>Nombre del ejercicio</label>
+        <input type="text" id="exName" placeholder="Ej: Press banca, Sentadilla..."/>
+    </div>
+
+    <div class="form-group">
+        <label>Categoría</label>
+        <select id="exCategory">
+        <option value="Pecho">Pecho</option>
+        <option value="Espalda">Espalda</option>
+        <option value="Piernas">Piernas</option>
+        <option value="Hombros">Hombros</option>
+        <option value="Bíceps">Bíceps</option>
+        <option value="Tríceps">Tríceps</option>
+        <option value="Core">Core</option>
+        <option value="Cardio">Cardio</option>
+        <option value="Otro">Otro</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Series</label>
+        <div class="sets-builder" id="setsBuilder"></div>
+        <button class="btn-add-set" id="addSetBtn">+ Añadir serie</button>
+    </div>
+
+    <div class="form-group">
+        <label>Notas (opcional)</label>
+        <input type="text" id="exNotes" placeholder="Ej: Agarre ancho, pausa abajo..."/>
+    </div>
+
+    <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
+    </div>
+</div>
+
+<div class="card card-full" style="margin-top: 20px;">
+    <div class="date-banner" id="dateBanner">
+    <div class="date-label" id="selectedDateLabel">Selecciona un día</div>
+    <div class="date-badge" id="trainedBadge" style="display:none">✓ DÍA ENTRENADO</div>
+    </div>
+    <div class="section-title">Ejercicios del día</div>
+    <div class="exercise-list" id="exerciseList">
+    <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <p>Selecciona un día en el calendario para ver o añadir ejercicios</p>
+    </div>
+    </div>
+</div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="editModal">
+<div class="modal">
+    <div class="modal-title">EDITAR EJERCICIO</div>
+    <div class="form-group">
+    <label>Nombre</label>
+    <input type="text" id="editName"/>
+    </div>
+    <div class="form-group">
+    <label>Categoría</label>
+    <select id="editCategory">
+        <option value="Pecho">Pecho</option>
+        <option value="Espalda">Espalda</option>
+        <option value="Piernas">Piernas</option>
+        <option value="Hombros">Hombros</option>
+        <option value="Bíceps">Bíceps</option>
+        <option value="Tríceps">Tríceps</option>
+        <option value="Core">Core</option>
+        <option value="Cardio">Cardio</option>
+        <option value="Otro">Otro</option>
+    </select>
+    </div>
+    <div class="form-group">
+    <label>Series</label>
+    <div class="sets-builder" id="editSetsBuilder"></div>
+    <button class="btn-add-set" id="editAddSetBtn">+ Añadir serie</button>
+    </div>
+    <div class="form-group">
+    <label>Notas</label>
+    <input type="text" id="editNotes"/>
+    </div>
+    <div class="modal-actions">
+    <button class="btn btn-secondary" id="cancelEdit">Cancelar</button>
+    <button class="btn btn-primary" style="flex:2" id="confirmEdit">GUARDAR CAMBIOS</button>
+    </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="./main.js"></script>
+</body>
+</html>
