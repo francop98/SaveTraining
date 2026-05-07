@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   /* ══════════════════════════════════════
-     ESTADO
+    ESTADO
   ══════════════════════════════════════ */
   var STORAGE_KEY = 'savetraining_v1';
 
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var addSets      = [];
 
   /* ══════════════════════════════════════
-     HELPERS
+    HELPERS
   ══════════════════════════════════════ */
   function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -78,47 +78,39 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderWeek() {
-    var grid    = document.getElementById('calGrid');
-    var monday  = getMondayOfWeek();
-    var todayStr = formatDate(new Date());
+  var grid     = document.getElementById('calGrid');
+  var today    = new Date();
+  var todayStr = formatDate(today);
 
-    grid.innerHTML = '';
+  grid.innerHTML = '';
 
-    for (var i = 0; i < 7; i++) {
-      var date    = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      var dateKey = formatDate(date);
+  var dateKey = todayStr;
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
 
-      var dd = String(date.getDate()).padStart(2, '0');
-      var mm = String(date.getMonth() + 1).padStart(2, '0');
+  var dayData = data[dateKey];
+  var trained = dayData && dayData.trained;
 
-      var dayData  = data[dateKey];
-      var trained  = dayData && dayData.trained;
+  var div = document.createElement('div');
+  div.className = 'cal-day';
+  div.classList.add('today');
+  if (trained)              div.classList.add('trained');
+  if (dateKey === selectedDate) div.classList.add('selected');
 
-      var div = document.createElement('div');
-      div.className = 'cal-day';
-      if (dateKey === todayStr)    div.classList.add('today');
-      if (trained)                 div.classList.add('trained');
-      if (dateKey === selectedDate) div.classList.add('selected');
+  var statusText = trained ? 'Entrenado ✓' : 'Sin entrenar';
 
-      var statusText = trained ? 'Entrenado ✓' : 'Sin entrenar';
+  div.innerHTML =
+    '<div class="day-name">' + DAY_SHORT[today.getDay()] + '</div>' +
+    '<div class="day-number">' + dd + '/' + mm + '</div>' +
+    '<div class="day-status">' + statusText + '</div>';
 
-      div.innerHTML =
-        '<div class="day-name">' + DAY_SHORT[date.getDay()] + '</div>' +
-        '<div class="day-number">' + dd + '/' + mm + '</div>' +
-        '<div class="day-status">' + statusText + '</div>';
+  div.addEventListener('click', function () { window.location.href = 'registrarEntrenamiento.html'; });
 
-      // Closure correcto capturando dateKey y date
-      (function (dk, dt) {
-        div.addEventListener('click', function () { selectDay(dk, dt); });
-      })(dateKey, new Date(date));
-
-      grid.appendChild(div);
-    }
-  }
+  grid.appendChild(div);
+}
 
   /* ══════════════════════════════════════
-     SELECCIONAR DÍA
+    SELECCIONAR DÍA
   ══════════════════════════════════════ */
   function selectDay(dateKey, dateObj) {
     selectedDate = dateKey;
@@ -370,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ══════════════════════════════════════
-     INIT
+    INIT
   ══════════════════════════════════════ */
   renderAddSets();  // inicializar sets vacío (muestra el builder limpio)
   renderWeek();
@@ -379,5 +371,4 @@ document.addEventListener('DOMContentLoaded', function () {
   // Seleccionar hoy automáticamente
   var todayDate = new Date();
   selectDay(formatDate(todayDate), todayDate);
-
 });
