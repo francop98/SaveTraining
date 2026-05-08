@@ -27,5 +27,108 @@
   var STORAGE_KEY = 'savetraining_v1';
   var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
-  var DAY_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-var DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  var DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+  function renderHistorial() {
+    var container = document.getElementById('historialContainer');
+
+    var diasEntrenados = Object.keys(data)
+      .filter(function(key) { return data[key] && data[key].trained; })
+      .sort(function(a, b) { return b.localeCompare(a); });
+
+    if (diasEntrenados.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">' +
+        '<div class="empty-icon">🏋️</div>' +
+        '<p>No hay entrenamientos registrados todavía.</p>' +
+        '</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+
+    diasEntrenados.forEach(function(dateKey) {
+      var day = data[dateKey];
+      var parts = dateKey.split('-');
+      var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      var dd = parts[2];
+      var mm = parts[1];
+      var yyyy = parts[0];
+      var dayName = DAY_FULL[dateObj.getDay()];
+
+      var totalSeries = day.exercises.reduce(function(acc, ex) {
+        return acc + ex.sets.length;
+      }, 0);
+
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.style.marginBottom = '16px';
+      card.style.cursor = 'pointer';
+
+      card.innerHTML =
+        '<div class="date-banner" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between">' +
+        '<div class="date-label">' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '</div>' +
+        '<div style="display:flex;gap:8px;align-items:center">' +
+        '<div class="date-badge">✅ DÍA ENTRENADO</div>' +
+        '<button class="btn btn-sm btn-danger" id="btn-del-' + dateKey + '">Eliminar</button>' +
+        '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">' +
+        '<span style="font-size:12px;color:var(--text-muted)">💪 <strong style="color:var(--accent)">' + day.exercises.length + '</strong> ejercicios</span>' +
+        '<span style="font-size:12px;color:var(--text-muted)">📋 <strong style="color:var(--accent)">' + totalSeries + '</strong> series</span>' +
+        '</div>';
+
+      // Primero appendChild, después los eventos
+      container.appendChild(card);
+
+      card.addEventListener('click', function() {
+  var detalle = card.querySelector('.detalle-entrenamiento');
+  if (detalle) {
+    detalle.remove();
+    return;
+  }
+
+  var day = data[dateKey];
+  var ejerciciosHtml = day.exercises.map(function(ex) {
+    var setsHtml = ex.sets.map(function(s, si) {
+      return '<div class="set-chip">' +
+        '<div class="set-num">Serie ' + (si + 1) + '</div>' +
+        '<div class="set-data"><span>' + s.reps + '</span> reps <span>' + s.weight + 'kg</span></div>' +
+        '</div>';
+    }).join('');
+
+    return '<div class="exercise-item" style="margin-bottom:8px">' +
+      '<div class="exercise-item-header">' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+      '<div class="exercise-name">' + ex.name + '</div>' +
+      '<div class="exercise-category">' + ex.category + '</div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="sets-grid">' + setsHtml + '</div>' +
+      (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">📝 ' + ex.notes + '</div>' : '') +
+      '</div>';
+  }).join('');
+
+  var detalle = document.createElement('div');
+  detalle.className = 'detalle-entrenamiento';
+  detalle.style.marginTop = '16px';
+  detalle.innerHTML = '<div class="exercise-list">' + ejerciciosHtml + '</div>';
+  card.appendChild(detalle);
+});
+
+      document.getElementById('btn-del-' + dateKey).addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!confirm('¿Eliminar el entrenamiento del ' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '?')) return;
+        delete data[dateKey];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        renderHistorial();
+      });
+    });
+  }
+
+  renderHistorial();
+</script>
+
+</body>
+</html>

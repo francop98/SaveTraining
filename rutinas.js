@@ -142,42 +142,57 @@ document.addEventListener('DOMContentLoaded', function () {
       var card = document.createElement('div');
       card.className = 'card';
       card.style.marginBottom = '12px';
+      card.style.cursor = 'pointer';
 
-      var ejHtml = rutina.ejercicios.map(function(ej) {
-        var setsHtml = ej.sets.map(function(s, si) {
-          return '<div class="set-chip">' +
-            '<div class="set-num">Serie ' + (si+1) + '</div>' +
-            '<div class="set-data"><span>' + (s.reps || '—') + '</span> reps · <span>' + (s.weight || '0') + 'kg</span></div>' +
+      card.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div class="section-title" style="margin-bottom:0">' + rutina.name + '</div>' +
+        '<button class="btn btn-sm btn-danger" id="btn-del-rutina-' + ri + '">Eliminar</button>' +
+        '</div>';
+
+      container.appendChild(card);
+
+      card.addEventListener('click', function() {
+        var detalle = card.querySelector('.detalle-rutina');
+        if (detalle) {
+          detalle.remove();
+          return;
+        }
+
+        var ejHtml = rutina.ejercicios.map(function(ej) {
+          var setsHtml = ej.sets.map(function(s, si) {
+            return '<div class="set-chip">' +
+              '<div class="set-num">Serie ' + (si + 1) + '</div>' +
+              '<div class="set-data"><span>' + (s.reps || '-') + '</span> reps <span>' + (s.weight || '0') + 'kg</span></div>' +
+              '</div>';
+          }).join('');
+
+          return '<div class="exercise-item" style="margin-bottom:8px">' +
+            '<div class="exercise-item-header">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+            '<div class="exercise-name">' + ej.name + '</div>' +
+            '<div class="exercise-category">' + ej.category + '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="sets-grid">' + setsHtml + '</div>' +
             '</div>';
         }).join('');
 
-        return '<div class="exercise-item" style="margin-bottom:8px">' +
-          '<div class="exercise-item-header">' +
-            '<div style="display:flex;align-items:center;gap:8px">' +
-              '<div class="exercise-name">' + ej.name + '</div>' +
-              '<div class="exercise-category">' + ej.category + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="sets-grid">' + setsHtml + '</div>' +
-          '</div>';
-      }).join('');
+        var detalle = document.createElement('div');
+        detalle.className = 'detalle-rutina';
+        detalle.style.marginTop = '16px';
+        detalle.innerHTML = '<div class="exercise-list">' + ejHtml + '</div>';
+        card.appendChild(detalle);
+      });
 
-      card.innerHTML =
-        '<div class="exercise-item-header">' +
-          '<div class="section-title" style="margin-bottom:0">' + rutina.name + '</div>' +
-          '<button class="btn btn-sm btn-danger" data-idx="' + ri + '">Eliminar</button>' +
-        '</div>' +
-        '<div style="margin-top:12px">' + ejHtml + '</div>';
-
-      card.querySelector('.btn-danger').addEventListener('click', function(e) {
-        if (!confirm('¿Eliminar esta rutina?')) return;
-        rutinas.splice(parseInt(e.target.dataset.idx), 1);
+      document.getElementById('btn-del-rutina-' + ri).addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!confirm('¿Eliminar la rutina "' + rutina.name + '"?')) return;
+        rutinas.splice(ri, 1);
         saveRutinas();
         renderRutinas();
         showToast('Rutina eliminada');
       });
-
-      container.appendChild(card);
     });
   }
 
