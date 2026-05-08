@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var div = document.createElement('div');
   div.className = 'cal-day';
   div.classList.add('today');
-  if (trained)              div.classList.add('trained');
   if (dateKey === selectedDate) div.classList.add('selected');
 
   var statusText = trained ? 'Entrenado ✓' : 'Sin entrenar';
