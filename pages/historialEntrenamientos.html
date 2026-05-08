@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Historial</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="../index.html" class="nav-link">← Inicio</a>
+</nav>
+
+<div class="app">
+  <header>
+    <div class="logo">HISTORIAL DE<span><br>ENTRENAMIENTOS</span></div>
+  </header>
+
+  <div id="historialContainer"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var STORAGE_KEY = 'savetraining_v1';
+  var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+  var DAY_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];

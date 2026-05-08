@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
   // Estructura: { "YYYY-MM-DD": { trained: bool, exercises: [] } }
 
-  var selectedDate = null;
+  var selectedDate = localStorage.getItem('selectedDate') || null;
   var editSets     = [];
   var addSets      = [];
 
@@ -103,7 +103,9 @@ document.addEventListener('DOMContentLoaded', function () {
     '<div class="day-number">' + dd + '/' + mm + '</div>' +
     '<div class="day-status">' + statusText + '</div>';
 
-  div.addEventListener('click', function () { window.location.href = 'registrarEntrenamiento.html'; });
+  div.addEventListener('click', function () {
+    window.location.href = 'pages/registrarEntrenamiento.html?date=' + dateKey;
+});
 
   grid.appendChild(div);
 }
