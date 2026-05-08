@@ -186,13 +186,6 @@
 
     .cal-day.empty { cursor: default; }
 
-    .cal-day.trained {
-    background: rgba(232,255,71,0.15);
-    border-color: var(--accent);
-    color: var(--accent);
-    font-weight: 600;
-    }
-
     .cal-day.trained::after {
     content: '●';
     position: absolute;
@@ -663,4 +656,12 @@
 
 .nav-link:hover {
   color: var(--text);
+}
+
+.cal-day.selected,
+.cal-day.selected.trained,
+.cal-day.selected.today {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #0d0d0f !important;
 }
