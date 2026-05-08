@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!selectedDate || !data[selectedDate]) {
       document.getElementById('statExercises').textContent = '0';
       document.getElementById('statSets').textContent      = '0';
-      document.getElementById('statWeight').textContent    = '0kg';
       return;
     }
     var exercises = data[selectedDate].exercises || [];

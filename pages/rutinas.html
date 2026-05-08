@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rutinas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="../index.html" class="nav-link">← Inicio</a>
+</nav>
+
+<div class="app">
+  <header>
+    <div class="logo">MIS<span><br>RUTINAS</span></div>
+  </header>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-title">Crear Rutina</div>
+    <div class="form-group">
+      <label>Nombre de la rutina</label>
+      <input type="text" id="rutinaName" placeholder="Ej: Día de pecho, Full body..."/>
+    </div>
+    <div class="form-group">
+      <label>Ejercicios</label>
+      <div id="ejerciciosRutina"></div>
+      <button class="btn-add-set" id="addEjercicioBtn">+ Añadir ejercicio</button>
+    </div>
+    <button class="btn btn-primary" id="saveRutinaBtn">GUARDAR RUTINA</button>
+  </div>
+
+  <div id="rutinasList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../rutinas.js"></script>
+</body>
+</html>

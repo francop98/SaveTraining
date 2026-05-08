@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Detalle Entrenamiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="historialEntrenamientos.html" class="nav-link">← Historial</a>
+</nav>
+
+<div class="app">
+  <header>
+    <div class="logo">DETALLE DE<span><br>ENTRENAMIENTO</span></div>
+  </header>
+
+  <div class="date-banner" id="dateBanner">
+    <div class="date-label" id="selectedDateLabel">—</div>
+    <div class="date-badge">✓ DÍA ENTRENADO</div>
+  </div>
+
+  <div class="exercise-list" id="exerciseList">
+    <div class="empty-state">
+      <div class="empty-icon">🏋️</div>
+      <p>No hay ejercicios registrados para este día.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var STORAGE_KEY = 'savetraining_v1';
+  var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+  var dateKey = localStorage.getItem('historial_selectedDate');
+
+  var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+  if (dateKey) {
+    var parts = dateKey.split('-');
+    var date  = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    var dd    = parts[2];
+    var mm    = parts[1];
+    var yyyy  = parts[0];
+
+    document.getElementById('selectedDateLabel').textContent =
+      DAY_FULL[date.getDay()] + ' ' + dd + '/' + mm + '/' + yyyy;
+
+    var day = data[dateKey];
+    if (day && day.exercises && day.exercises.length > 0) {
+      var list = document.getElementById('exerciseList');
+      list.innerHTML = '';
+
+      day.exercises.forEach(function(ex, i) {
+        var setsHtml = ex.sets.map(function(s, si) {
+          return '<div class="set-chip">' +
+            '<div class="set-num">Serie ' + (si+1) + '</div>' +
+            '<div class="set-data"><span>' + s.reps + '</span> reps · <span>' + s.weight + 'kg</span></div>' +
+            '</div>';
+        }).join('');
+
+        var item = document.createElement('div');
+        item.className = 'exercise-item';
+        item.innerHTML =
+          '<div class="exercise-item-header">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+              '<div class="exercise-name">' + ex.name + '</div>' +
+              '<div class="exercise-category">' + ex.category + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sets-grid">' + setsHtml + '</div>' +
+          (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:8px">📝 ' + ex.notes + '</div>' : '');
+
+        list.appendChild(item);
+      });
+    }
+  }
+</script>
+</body>
+</html>
