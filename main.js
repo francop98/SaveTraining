@@ -39,9 +39,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function updateTotalDays() {
-    var count = Object.values(data).filter(function (d) { return d.trained; }).length;
-    document.getElementById('totalDays').textContent = count;
-  }
+  var year = new Date().getFullYear();
+  var count = Object.keys(data).filter(function(dateKey) {
+    return data[dateKey].trained && dateKey.startsWith(year);
+  }).length;
+  document.getElementById('totalDays').textContent = count;
+}
 
   function updateStats() {
     if (!selectedDate || !data[selectedDate]) {

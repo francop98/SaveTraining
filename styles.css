@@ -669,3 +669,8 @@
 #totalDays{
     text-align:center;
 }
+
+.label-dias-entrenados{
+    text-align:center;
+    color:grey;
+}

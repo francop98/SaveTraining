@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Datos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(232,255,71,0.07);
+    }
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      margin-top: 16px;
+    }
+    .muscle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .muscle-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .muscle-card .muscle-count {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .muscle-card .muscle-name {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 4px;
+    }
+    .select-ejercicio {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .no-data {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="../index.html" class="nav-link">← Inicio</a>
+</nav>
+
+<div class="app">
+  <header>
+    <div class="logo">MIS<span><br>DATOS</span></div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('musculos')">Músculos</button>
+    <button class="tab-btn" onclick="showTab('progreso')">Progreso por ejercicio</button>
+  </div>
+
+  <!-- TAB 1: MÚSCULOS -->
+  <div class="tab-section active" id="tab-musculos">
+    <div class="card">
+      <div class="section-title">Veces que entrenaste cada músculo</div>
+      <div class="muscle-grid" id="muscleGrid"></div>
+      <div class="chart-container">
+        <canvas id="muscleChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: PROGRESO POR EJERCICIO -->
+  <div class="tab-section" id="tab-progreso">
+    <div class="card">
+      <div class="section-title">Progreso de peso por ejercicio</div>
+      <div class="form-group">
+        <label>Seleccioná un ejercicio</label>
+        <select id="ejercicioSelect" class="select-ejercicio">
+          <option value="">-- Elegí un ejercicio --</option>
+        </select>
+      </div>
+      <div id="progresoContent">
+        <div class="no-data">Seleccioná un ejercicio para ver su progreso.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var STORAGE_KEY = 'savetraining_v1';
+  var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+  var muscleChartInstance = null;
+  var progresoChartInstance = null;
+
+  // ---- TABS ----
+  function showTab(name) {
+    document.querySelectorAll('.tab-section').forEach(function(s) { s.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // ---- TAB 1: MÚSCULOS ----
+  var categorias = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'];
+
+  function calcMusculos() {
+    var counts = {};
+    categorias.forEach(function(c) { counts[c] = 0; });
+
+    Object.keys(data).forEach(function(dateKey) {
+      var day = data[dateKey];
+      if (!day.trained || !day.exercises) return;
+
+      var categoriasDelDia = {};
+      day.exercises.forEach(function(ex) {
+        var cat = ex.category;
+        var key = categorias.find(function(c) {
+          return c.toLowerCase() === (cat || '').toLowerCase();
+        }) || cat;
+        categoriasDelDia[key] = true;
+      });
+
+      Object.keys(categoriasDelDia).forEach(function(key) {
+        if (counts[key] !== undefined) counts[key]++;
+        else counts[key] = 1;
+      });
+    });
+    return counts;
+  }
+
+  function renderMusculos() {
+    var counts = calcMusculos();
+    var grid = document.getElementById('muscleGrid');
+    grid.innerHTML = '';
+
+    categorias.forEach(function(cat) {
+      var n = counts[cat] || 0;
+      var div = document.createElement('div');
+      div.className = 'muscle-card';
+      div.innerHTML =
+        '<div class="muscle-count">' + n + '</div>' +
+        '<div class="muscle-name">' + cat + '</div>';
+      grid.appendChild(div);
+    });
+
+    // Gráfico de barras
+    var ctx = document.getElementById('muscleChart').getContext('2d');
+    if (muscleChartInstance) muscleChartInstance.destroy();
+
+    muscleChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: categorias,
+        datasets: [{
+          label: 'Ejercicios realizados',
+          data: categorias.map(function(c) { return counts[c] || 0; }),
+          backgroundColor: 'rgba(232,255,71,0.25)',
+          borderColor: '#e8ff47',
+          borderWidth: 2,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#6b6b7a', font: { size: 11 } }, grid: { color: '#2a2a32' } },
+          y: { ticks: { color: '#6b6b7a', stepSize: 1 }, grid: { color: '#2a2a32' }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // ---- TAB 2: PROGRESO POR EJERCICIO ----
+  function getEjercicios() {
+    var map = {}; // nombre -> [{fecha, maxPeso}]
+
+    Object.keys(data).sort().forEach(function(dateKey) {
+      var day = data[dateKey];
+      if (!day.trained || !day.exercises) return;
+      day.exercises.forEach(function(ex) {
+        var nombre = ex.name.trim();
+        if (!nombre) return;
+        var maxPeso = Math.max.apply(null, ex.sets.map(function(s) {
+          return parseFloat(s.weight) || 0;
+        }));
+        if (!map[nombre]) map[nombre] = [];
+        map[nombre].push({ fecha: dateKey, peso: maxPeso });
+      });
+    });
+    return map;
+  }
+
+  function formatFecha(dateKey) {
+    var p = dateKey.split('-');
+    return p[2] + '/' + p[1];
+  }
+
+  function renderProgresoSelect() {
+    var map = getEjercicios();
+    var select = document.getElementById('ejercicioSelect');
+    select.innerHTML = '<option value="">-- Elegí un ejercicio --</option>';
+    Object.keys(map).sort().forEach(function(nombre) {
+      var opt = document.createElement('option');
+      opt.value = nombre;
+      opt.textContent = nombre;
+      select.appendChild(opt);
+    });
+  }
+
+  function renderProgreso(nombre) {
+    var map = getEjercicios();
+    var content = document.getElementById('progresoContent');
+
+    if (!nombre || !map[nombre]) {
+      content.innerHTML = '<div class="no-data">Seleccioná un ejercicio para ver su progreso.</div>';
+      return;
+    }
+
+    var registros = map[nombre];
+
+    if (registros.length < 2) {
+      content.innerHTML = '<div class="no-data">Necesitás al menos 2 registros de este ejercicio para ver el progreso.</div>';
+      return;
+    }
+
+    content.innerHTML = '<div class="chart-container"><canvas id="progresoChart"></canvas></div>';
+
+    var ctx = document.getElementById('progresoChart').getContext('2d');
+    if (progresoChartInstance) progresoChartInstance.destroy();
+
+    progresoChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: registros.map(function(r) { return formatFecha(r.fecha); }),
+        datasets: [{
+          label: 'Peso máximo (kg)',
+          data: registros.map(function(r) { return r.peso; }),
+          borderColor: '#e8ff47',
+          backgroundColor: 'rgba(232,255,71,0.08)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#e8ff47',
+          pointRadius: 5,
+          tension: 0.3,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) { return ctx.parsed.y + ' kg'; }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#6b6b7a' }, grid: { color: '#2a2a32' } },
+          y: { ticks: { color: '#6b6b7a' }, grid: { color: '#2a2a32' }, beginAtZero: false }
+        }
+      }
+    });
+  }
+
+  document.getElementById('ejercicioSelect').addEventListener('change', function() {
+    renderProgreso(this.value);
+  });
+
+  // INIT
+  renderMusculos();
+  renderProgresoSelect();
+</script>
+</body>
+</html>
