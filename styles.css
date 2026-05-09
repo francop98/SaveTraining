@@ -665,3 +665,7 @@
     border-color: var(--accent) !important;
     color: #0d0d0f !important;
 }
+
+#totalDays{
+    text-align:center;
+}
