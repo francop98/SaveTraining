@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Historial</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="../styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
 
@@ -17,117 +17,128 @@
   <header>
     <div class="logo">HISTORIAL DE<span><br>ENTRENAMIENTOS</span></div>
   </header>
-
   <div id="historialContainer"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  var STORAGE_KEY = 'savetraining_v1';
-  var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+var STORAGE_KEY = 'savetraining_v1';
+var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
-  var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-  var DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+var DAY_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-  function renderHistorial() {
-    var container = document.getElementById('historialContainer');
+var TRASH_SVG =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:middle;pointer-events:none">' +
+    '<polyline points="3 6 5 6 21 6"/>' +
+    '<path d="M19 6l-1 14H6L5 6"/>' +
+    '<path d="M10 11v6"/>' +
+    '<path d="M14 11v6"/>' +
+    '<path d="M9 6V4h6v2"/>' +
+  '</svg>';
 
-    var diasEntrenados = Object.keys(data)
-      .filter(function(key) { return data[key] && data[key].trained; })
-      .sort(function(a, b) { return b.localeCompare(a); });
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2200);
+}
 
-    if (diasEntrenados.length === 0) {
-      container.innerHTML =
-        '<div class="empty-state">' +
-        '<div class="empty-icon">🏋️</div>' +
-        '<p>No hay entrenamientos registrados todavía.</p>' +
-        '</div>';
-      return;
-    }
+function renderHistorial() {
+  var container = document.getElementById('historialContainer');
 
-    container.innerHTML = '';
+  var diasEntrenados = Object.keys(data)
+    .filter(function (key) { return data[key] && data[key].trained; })
+    .sort(function (a, b) { return b.localeCompare(a); });
 
-    diasEntrenados.forEach(function(dateKey) {
-      var day = data[dateKey];
-      var parts = dateKey.split('-');
-      var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      var dd = parts[2];
-      var mm = parts[1];
-      var yyyy = parts[0];
-      var dayName = DAY_FULL[dateObj.getDay()];
-
-      var totalSeries = day.exercises.reduce(function(acc, ex) {
-        return acc + ex.sets.length;
-      }, 0);
-
-      var card = document.createElement('div');
-      card.className = 'card';
-      card.style.marginBottom = '16px';
-      card.style.cursor = 'pointer';
-
-      card.innerHTML =
-        '<div class="date-banner" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between">' +
-        '<div class="date-label">' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '</div>' +
-        '<div style="display:flex;gap:8px;align-items:center">' +
-        '<div class="date-badge">✅ DÍA ENTRENADO</div>' +
-        '<button class="btn btn-sm btn-danger" id="btn-del-' + dateKey + '">Eliminar</button>' +
-        '</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">' +
-        '<span style="font-size:12px;color:var(--text-muted)">💪 <strong style="color:var(--accent)">' + day.exercises.length + '</strong> ejercicios</span>' +
-        '<span style="font-size:12px;color:var(--text-muted)">📋 <strong style="color:var(--accent)">' + totalSeries + '</strong> series</span>' +
-        '</div>';
-
-      // Primero appendChild, después los eventos
-      container.appendChild(card);
-
-      card.addEventListener('click', function() {
-  var detalle = card.querySelector('.detalle-entrenamiento');
-  if (detalle) {
-    detalle.remove();
+  if (diasEntrenados.length === 0) {
+    container.innerHTML =
+      '<div class="empty-state">' +
+      '<div class="empty-icon">📭</div>' +
+      '<p>No hay entrenamientos registrados todavía.</p>' +
+      '</div>';
     return;
   }
 
-  var day = data[dateKey];
-  var ejerciciosHtml = day.exercises.map(function(ex) {
-    var setsHtml = ex.sets.map(function(s, si) {
-      return '<div class="set-chip">' +
-        '<div class="set-num">Serie ' + (si + 1) + '</div>' +
-        '<div class="set-data"><span>' + s.reps + '</span> reps <span>' + s.weight + 'kg</span></div>' +
-        '</div>';
-    }).join('');
+  container.innerHTML = '';
 
-    return '<div class="exercise-item" style="margin-bottom:8px">' +
-      '<div class="exercise-item-header">' +
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-      '<div class="exercise-name">' + ex.name + '</div>' +
-      '<div class="exercise-category">' + ex.category + '</div>' +
+  diasEntrenados.forEach(function (dateKey) {
+    var day  = data[dateKey];
+    var parts   = dateKey.split('-');
+    var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    var dd      = parts[2];
+    var mm      = parts[1];
+    var yyyy    = parts[0];
+    var dayName = DAY_FULL[dateObj.getDay()];
+
+    var totalSeries = day.exercises.reduce(function (acc, ex) {
+      return acc + ex.sets.length;
+    }, 0);
+
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '16px';
+    card.style.cursor = 'pointer';
+
+    card.innerHTML =
+      '<div class="date-banner" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between">' +
+        '<div class="date-label">' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '</div>' +
+        '<div style="display:flex;gap:8px;align-items:center">' +
+          '<div class="date-badge">✓ DÍA ENTRENADO</div>' +
+          '<button class="btn btn-sm btn-danger" id="btn-del-' + dateKey + '" title="Eliminar entrenamiento">' + TRASH_SVG + '</button>' +
+        '</div>' +
       '</div>' +
-      '</div>' +
-      '<div class="sets-grid">' + setsHtml + '</div>' +
-      (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">📝 ' + ex.notes + '</div>' : '') +
+      '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">' +
+        '<span style="font-size:12px;color:var(--text-muted)">🏋️ <strong style="color:var(--accent)">' + day.exercises.length + '</strong> ejercicios</span>' +
+        '<span style="font-size:12px;color:var(--text-muted)">📊 <strong style="color:var(--accent)">' + totalSeries + '</strong> series</span>' +
       '</div>';
-  }).join('');
 
-  var detalle = document.createElement('div');
-  detalle.className = 'detalle-entrenamiento';
-  detalle.style.marginTop = '16px';
-  detalle.innerHTML = '<div class="exercise-list">' + ejerciciosHtml + '</div>';
-  card.appendChild(detalle);
-});
+    container.appendChild(card);
 
-      document.getElementById('btn-del-' + dateKey).addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (!confirm('¿Eliminar el entrenamiento del ' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '?')) return;
-        delete data[dateKey];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        renderHistorial();
-      });
+    card.addEventListener('click', function () {
+      var detalle = card.querySelector('.detalle-entrenamiento');
+      if (detalle) { detalle.remove(); return; }
+
+      var ejerciciosHtml = data[dateKey].exercises.map(function (ex) {
+        var setsHtml = ex.sets.map(function (s, si) {
+          return '<div class="set-chip">' +
+            '<div class="set-num">Serie ' + (si + 1) + '</div>' +
+            '<div class="set-data"><span>' + s.reps + '</span> reps <span>' + s.weight + 'kg</span></div>' +
+            '</div>';
+        }).join('');
+
+        return '<div class="exercise-item" style="margin-bottom:8px">' +
+          '<div class="exercise-item-header">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+              '<div class="exercise-name">' + ex.name + '</div>' +
+              '<div class="exercise-category">' + ex.category + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sets-grid">' + setsHtml + '</div>' +
+          (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">📝 ' + ex.notes + '</div>' : '') +
+          '</div>';
+      }).join('');
+
+      var detalle = document.createElement('div');
+      detalle.className = 'detalle-entrenamiento';
+      detalle.style.marginTop = '16px';
+      detalle.innerHTML = '<div class="exercise-list">' + ejerciciosHtml + '</div>';
+      card.appendChild(detalle);
     });
-  }
 
-  renderHistorial();
+    document.getElementById('btn-del-' + dateKey).addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!confirm('¿Eliminar el entrenamiento del ' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '?')) return;
+      delete data[dateKey];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      renderHistorial();
+      showToast('Entrenamiento eliminado');
+    });
+  });
+}
+
+renderHistorial();
 </script>
 
 </body>
