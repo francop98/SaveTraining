@@ -1,11 +1,119 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Registrar Entrenamiento</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="../styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrar Entrenamiento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    /* Modal de selección de inicio */
+    .modal-inicio {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      animation: modalIn 0.25s ease;
+    }
+    .modal-inicio .modal-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .modal-inicio .modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .opcion-btn {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .opcion-btn:hover {
+      border-color: var(--accent);
+      background: rgba(232,255,71,0.05);
+    }
+    .opcion-btn .opcion-icon {
+      font-size: 22px;
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .opcion-btn .opcion-text .opcion-label {
+      font-size: 15px;
+      color: var(--text);
+    }
+    .opcion-btn .opcion-text .opcion-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 2px;
+    }
+    .rutina-select-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .rutina-option {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .rutina-option:hover {
+      border-color: var(--accent);
+      background: rgba(232,255,71,0.06);
+    }
+    .rutina-option.selected {
+      border-color: var(--accent);
+      background: rgba(232,255,71,0.1);
+    }
+    .rutina-option .rutina-nombre {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .rutina-option .rutina-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .back-link {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 0;
+      margin-top: 8px;
+      display: block;
+      text-align: center;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--text); }
+  </style>
 </head>
 <body>
 <nav class="navbar">
@@ -16,56 +124,203 @@
     <div class="logo">REGISTRAR<span><br>ENTRENAMIENTO</span></div>
   </header>
 
-  <div class="card">
-    <div class="section-title">Añadir Ejercicio</div>
+  <!-- Modal de selección: ¿rutina o libre? -->
+  <div class="modal-overlay" id="modalInicio" style="display:flex">
+    <div class="modal-inicio">
+      <div class="modal-title">¿Cómo empezamos?</div>
+      <div class="modal-subtitle" id="modalFechaLabel">Seleccioná cómo querés registrar el entrenamiento</div>
 
-    <div class="form-group">
-      <label>Nombre del ejercicio</label>
-      <input type="text" id="exName" placeholder="Ej: Press banca, Sentadilla..."/>
+      <!-- Paso 1: opciones -->
+      <div id="pasoOpciones">
+        <button class="opcion-btn" id="btnUsarRutina">
+          <div class="opcion-icon">📋</div>
+          <div class="opcion-text">
+            <div class="opcion-label">Usar una rutina</div>
+            <div class="opcion-desc">Cargar ejercicios desde una rutina guardada</div>
+          </div>
+        </button>
+        <button class="opcion-btn" id="btnLibre">
+          <div class="opcion-icon">✏️</div>
+          <div class="opcion-text">
+            <div class="opcion-label">Entrenamiento libre</div>
+            <div class="opcion-desc">Agregar ejercicios manualmente</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Paso 2: lista de rutinas -->
+      <div id="pasoRutinas" style="display:none">
+        <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:12px">Elegí una rutina</div>
+        <div class="rutina-select-list" id="rutinaSelectList"></div>
+        <button class="btn btn-primary" id="btnCargarRutina" style="margin-top:0" disabled>CARGAR RUTINA</button>
+        <button class="back-link" id="btnVolverOpciones">← Volver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de ejercicios -->
+  <div id="contenidoRegistro" style="display:none">
+    <div class="card" id="rutinaInfoCard" style="display:none;margin-bottom:16px;background:rgba(232,255,71,0.06);border-color:rgba(232,255,71,0.25)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Rutina cargada</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:1px" id="rutinaInfoNombre"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted)" id="rutinaInfoEj"></div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Categoría</label>
-      <select id="exCategory">
-        <option value="Pecho">Pecho</option>
-        <option value="Espalda">Espalda</option>
-        <option value="Piernas">Piernas</option>
-        <option value="Hombros">Hombros</option>
-        <option value="Bíceps">Bíceps</option>
-        <option value="Tríceps">Tríceps</option>
-        <option value="Core">Core</option>
-        <option value="Cardio">Cardio</option>
-        <option value="Otro">Otro</option>
-      </select>
-    </div>
+    <div class="card">
+      <div class="section-title">Añadir Ejercicio</div>
 
-    <div class="form-group">
-      <label>Series</label>
-      <div class="sets-builder" id="setsBuilder"></div>
-      <button class="btn-add-set" id="addSetBtn">+ Añadir serie</button>
-    </div>
+      <div class="form-group">
+        <label>Nombre del ejercicio</label>
+        <input type="text" id="exName" placeholder="Ej: Press banca, Sentadilla..."/>
+      </div>
 
-    <div class="form-group">
-      <label>Notas (opcional)</label>
-      <input type="text" id="exNotes" placeholder="Ej: Agarre ancho, pausa abajo..."/>
-    </div>
+      <div class="form-group">
+        <label>Categoría</label>
+        <select id="exCategory">
+          <option value="Pecho">Pecho</option>
+          <option value="Espalda">Espalda</option>
+          <option value="Piernas">Piernas</option>
+          <option value="Hombros">Hombros</option>
+          <option value="Bíceps">Bíceps</option>
+          <option value="Tríceps">Tríceps</option>
+          <option value="Core">Core</option>
+          <option value="Cardio">Cardio</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
 
-    <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
+      <div class="form-group">
+        <label>Series</label>
+        <div class="sets-builder" id="setsBuilder"></div>
+        <button class="btn-add-set" id="addSetBtn">+ Añadir serie</button>
+      </div>
+
+      <div class="form-group">
+        <label>Notas (opcional)</label>
+        <input type="text" id="exNotes" placeholder="Ej: Agarre ancho, pausa abajo..."/>
+      </div>
+
+      <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  var params = new URLSearchParams(window.location.search);
-  var fechaSeleccionada = params.get('date');
-  if (fechaSeleccionada) {
-    localStorage.setItem('selectedDate', fechaSeleccionada);
+var params = new URLSearchParams(window.location.search);
+var fechaSeleccionada = params.get('date');
+if (fechaSeleccionada) {
+  localStorage.setItem('selectedDate', fechaSeleccionada);
+}
+
+// Mostrar fecha en el modal
+var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+if (fechaSeleccionada) {
+  var parts = fechaSeleccionada.split('-');
+  var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  document.getElementById('modalFechaLabel').textContent =
+    DAY_FULL[dateObj.getDay()] + ' ' + parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+
+var RUTINAS_KEY = 'savetraining_rutinas';
+var rutinas = JSON.parse(localStorage.getItem(RUTINAS_KEY) || '[]');
+var rutinaSeleccionadaIdx = null;
+
+// ---- PASO 1: Opciones ----
+document.getElementById('btnLibre').addEventListener('click', function () {
+  document.getElementById('modalInicio').style.display = 'none';
+  document.getElementById('contenidoRegistro').style.display = 'block';
+});
+
+document.getElementById('btnUsarRutina').addEventListener('click', function () {
+  if (rutinas.length === 0) {
+    showToast('No tenés rutinas guardadas. Creá una en la sección Rutinas.');
+    return;
   }
+  document.getElementById('pasoOpciones').style.display = 'none';
+  document.getElementById('pasoRutinas').style.display = 'block';
+  renderRutinaSelectList();
+});
+
+document.getElementById('btnVolverOpciones').addEventListener('click', function () {
+  document.getElementById('pasoRutinas').style.display = 'none';
+  document.getElementById('pasoOpciones').style.display = 'block';
+  rutinaSeleccionadaIdx = null;
+});
+
+// ---- PASO 2: Lista de rutinas ----
+function renderRutinaSelectList() {
+  var list = document.getElementById('rutinaSelectList');
+  list.innerHTML = '';
+  rutinas.forEach(function (r, i) {
+    var div = document.createElement('div');
+    div.className = 'rutina-option';
+    div.innerHTML =
+      '<div class="rutina-nombre">' + r.name + '</div>' +
+      '<div class="rutina-info">' + r.ejercicios.length + ' ejercicio(s)</div>';
+    div.addEventListener('click', function () {
+      list.querySelectorAll('.rutina-option').forEach(function (el) { el.classList.remove('selected'); });
+      div.classList.add('selected');
+      rutinaSeleccionadaIdx = i;
+      document.getElementById('btnCargarRutina').disabled = false;
+    });
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('btnCargarRutina').addEventListener('click', function () {
+  if (rutinaSeleccionadaIdx === null) return;
+  var rutina = rutinas[rutinaSeleccionadaIdx];
+
+  // Pre-cargar ejercicios de la rutina en localStorage para que registrar.js los encuentre
+  var STORAGE_KEY = 'savetraining_v1';
+  var trainingData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var dateKey = fechaSeleccionada || localStorage.getItem('selectedDate');
+
+  if (dateKey) {
+    if (!trainingData[dateKey]) trainingData[dateKey] = { trained: false, exercises: [] };
+    // Añadir ejercicios de la rutina (sin duplicar por nombre)
+    rutina.ejercicios.forEach(function (ej) {
+      var existe = trainingData[dateKey].exercises.some(function (e) {
+        return e.name.trim().toLowerCase() === ej.name.trim().toLowerCase();
+      });
+      if (!existe && ej.name.trim()) {
+        trainingData[dateKey].exercises.push({
+          name: ej.name,
+          category: ej.category,
+          sets: ej.sets.length > 0
+            ? ej.sets.map(function (s) { return { reps: s.reps || '-', weight: s.weight || '0' }; })
+            : [{ reps: '-', weight: '0' }],
+          notes: ej.notes || ''
+        });
+        trainingData[dateKey].trained = true;
+      }
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trainingData));
+  }
+
+  // Mostrar info de rutina cargada
+  document.getElementById('rutinaInfoCard').style.display = 'block';
+  document.getElementById('rutinaInfoNombre').textContent = rutina.name;
+  document.getElementById('rutinaInfoEj').textContent = rutina.ejercicios.length + ' ejercicio(s) cargado(s)';
+
+  document.getElementById('modalInicio').style.display = 'none';
+  document.getElementById('contenidoRegistro').style.display = 'block';
+});
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2500);
+}
 </script>
 
 <script src="../registrar.js"></script>
-
-
 </body>
 </html>

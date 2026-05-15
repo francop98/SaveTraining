@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Rutinas</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="../styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rutinas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
 
@@ -19,7 +19,7 @@
   </header>
 
   <div class="card" style="margin-bottom:20px">
-    <div class="section-title">Crear Rutina</div>
+    <div class="section-title" id="formTitle">Crear Rutina</div>
     <div class="form-group">
       <label>Nombre de la rutina</label>
       <input type="text" id="rutinaName" placeholder="Ej: Día de pecho, Full body..."/>
@@ -29,7 +29,10 @@
       <div id="ejerciciosRutina"></div>
       <button class="btn-add-set" id="addEjercicioBtn">+ Añadir ejercicio</button>
     </div>
-    <button class="btn btn-primary" id="saveRutinaBtn">GUARDAR RUTINA</button>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" id="cancelEditBtn" style="display:none;flex:1">Cancelar</button>
+      <button class="btn btn-primary" id="saveRutinaBtn" style="flex:2;margin-top:0">GUARDAR RUTINA</button>
+    </div>
   </div>
 
   <div id="rutinasList"></div>

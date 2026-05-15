@@ -26,16 +26,15 @@
 var STORAGE_KEY = 'savetraining_v1';
 var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
-var DAY_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-var DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 var TRASH_SVG =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:middle;pointer-events:none">' +
-    '<polyline points="3 6 5 6 21 6"/>' +
-    '<path d="M19 6l-1 14H6L5 6"/>' +
-    '<path d="M10 11v6"/>' +
-    '<path d="M14 11v6"/>' +
-    '<path d="M9 6V4h6v2"/>' +
+  '<polyline points="3 6 5 6 21 6"/>' +
+  '<path d="M19 6l-1 14H6L5 6"/>' +
+  '<path d="M10 11v6"/>' +
+  '<path d="M14 11v6"/>' +
+  '<path d="M9 6V4h6v2"/>' +
   '</svg>';
 
 function showToast(msg) {
@@ -55,7 +54,7 @@ function renderHistorial() {
   if (diasEntrenados.length === 0) {
     container.innerHTML =
       '<div class="empty-state">' +
-      '<div class="empty-icon">📭</div>' +
+      '<div class="empty-icon">📅</div>' +
       '<p>No hay entrenamientos registrados todavía.</p>' +
       '</div>';
     return;
@@ -64,12 +63,12 @@ function renderHistorial() {
   container.innerHTML = '';
 
   diasEntrenados.forEach(function (dateKey) {
-    var day  = data[dateKey];
-    var parts   = dateKey.split('-');
+    var day = data[dateKey];
+    var parts = dateKey.split('-');
     var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    var dd      = parts[2];
-    var mm      = parts[1];
-    var yyyy    = parts[0];
+    var dd = parts[2];
+    var mm = parts[1];
+    var yyyy = parts[0];
     var dayName = DAY_FULL[dateObj.getDay()];
 
     var totalSeries = day.exercises.reduce(function (acc, ex) {
@@ -83,15 +82,15 @@ function renderHistorial() {
 
     card.innerHTML =
       '<div class="date-banner" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between">' +
-        '<div class="date-label">' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '</div>' +
-        '<div style="display:flex;gap:8px;align-items:center">' +
-          '<div class="date-badge">✓ DÍA ENTRENADO</div>' +
-          '<button class="btn btn-sm btn-danger" id="btn-del-' + dateKey + '" title="Eliminar entrenamiento">' + TRASH_SVG + '</button>' +
-        '</div>' +
+      '<div class="date-label">' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+      '<div class="date-badge">✓ DÍA ENTRENADO</div>' +
+      '<button class="btn btn-sm btn-danger" id="btn-del-' + dateKey + '" title="Eliminar entrenamiento">' + TRASH_SVG + '</button>' +
+      '</div>' +
       '</div>' +
       '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">' +
-        '<span style="font-size:12px;color:var(--text-muted)">🏋️ <strong style="color:var(--accent)">' + day.exercises.length + '</strong> ejercicios</span>' +
-        '<span style="font-size:12px;color:var(--text-muted)">📊 <strong style="color:var(--accent)">' + totalSeries + '</strong> series</span>' +
+      '<span style="font-size:12px;color:var(--text-muted)">💪 <strong style="color:var(--accent)">' + day.exercises.length + '</strong> ejercicios</span>' +
+      '<span style="font-size:12px;color:var(--text-muted)">🔁 <strong style="color:var(--accent)">' + totalSeries + '</strong> series</span>' +
       '</div>';
 
     container.appendChild(card);
@@ -110,10 +109,10 @@ function renderHistorial() {
 
         return '<div class="exercise-item" style="margin-bottom:8px">' +
           '<div class="exercise-item-header">' +
-            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-              '<div class="exercise-name">' + ex.name + '</div>' +
-              '<div class="exercise-category">' + ex.category + '</div>' +
-            '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+          '<div class="exercise-name">' + ex.name + '</div>' +
+          '<div class="exercise-category">' + ex.category + '</div>' +
+          '</div>' +
           '</div>' +
           '<div class="sets-grid">' + setsHtml + '</div>' +
           (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">📝 ' + ex.notes + '</div>' : '') +
