@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8" />
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>Ejercicios</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="../styles.css">
+
+<style>
+
+.exercise-listing {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exercise-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.exercise-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.exercise-category {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.empty-exercises {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.create-btn {
+  width: 100%;
+  margin-top: 18px;
+}
+
+#createForm {
+  display: none;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+  <a href="../index.html" class="nav-link">
+    ← Inicio
+  </a>
+
+</nav>
+
+<div class="app">
+
+<header>
+
+  <div class="logo">
+    MIS<span><br>EJERCICIOS</span>
+  </div>
+
+</header>
+
+
+
+<div class="card">
+
+  <div class="section-title">
+    Ejercicios registrados
+  </div>
+
+  <div
+    class="exercise-listing"
+    id="exerciseListing"
+  ></div>
+
+  <button
+    class="btn btn-primary create-btn"
+    id="toggleCreateBtn"
+  >
+    AÑADIR NUEVO EJERCICIO
+  </button>
+
+  <!-- FORMULARIO -->
+
+  <div id="createForm">
+
+    <div class="form-group">
+
+      <label>Nombre del ejercicio</label>
+
+      <input
+        type="text"
+        id="exName"
+        placeholder="Ej: Press banca"
+      />
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Categoría</label>
+
+      <select id="exCategory">
+
+        <option value="Pecho">Pecho</option>
+        <option value="Espalda">Espalda</option>
+        <option value="Piernas">Piernas</option>
+        <option value="Hombros">Hombros</option>
+        <option value="Bíceps">Bíceps</option>
+        <option value="Tríceps">Tríceps</option>
+        <option value="Core">Core</option>
+        <option value="Cardio">Cardio</option>
+        <option value="Otro">Otro</option>
+
+      </select>
+
+    </div>
+
+    <button
+      class="btn btn-primary"
+      id="saveExerciseBtn"
+    >
+      GUARDAR EJERCICIO
+    </button>
+
+  </div>
+
+</div>
+
+</div>
+
+<script>
+
+var STORAGE_KEY = 'savetraining_v1';
+
+var data = JSON.parse(
+  localStorage.getItem(STORAGE_KEY) || '{}'
+);
+
+function getUniqueExercises() {
+
+  var map = {};
+
+  Object.keys(data).forEach(function(dateKey) {
+
+    var day = data[dateKey];
+
+    if (!day.exercises) return;
+
+    day.exercises.forEach(function(ex) {
+
+      var key = ex.name.trim().toLowerCase();
+
+      if (!key) return;
+
+      if (!map[key]) {
+
+        map[key] = {
+          name: ex.name,
+          category: ex.category || 'Otro'
+        };
+
+      }
+
+    });
+
+  });
+
+  return Object.values(map);
+
+}
+
+function renderExercises() {
+
+  var exercises = getUniqueExercises();
+
+  var container =
+    document.getElementById('exerciseListing');
+
+  container.innerHTML = '';
+
+  if (exercises.length === 0) {
+
+    container.innerHTML =
+
+      '<div class="empty-exercises">' +
+      'Todavía no registraste ejercicios.' +
+      '</div>';
+
+    return;
+
+  }
+
+  exercises.sort(function(a, b) {
+
+    return a.name.localeCompare(b.name);
+
+  });
+
+  exercises.forEach(function(ex) {
+
+    var div = document.createElement('div');
+
+    div.className = 'exercise-card';
+
+    div.innerHTML =
+
+      '<div class="exercise-name">' +
+      ex.name +
+      '</div>' +
+
+      '<div class="exercise-category">' +
+      ex.category +
+      '</div>';
+
+    container.appendChild(div);
+
+  });
+
+}
+
+document
+  .getElementById('toggleCreateBtn')
+  .addEventListener('click', function() {
+
+    var form =
+      document.getElementById('createForm');
+
+    form.style.display =
+      form.style.display === 'block'
+        ? 'none'
+        : 'block';
+
+  });
+
+document
+  .getElementById('saveExerciseBtn')
+  .addEventListener('click', function() {
+
+    var name =
+      document.getElementById('exName')
+      .value
+      .trim();
+
+    if (!name) return;
+
+    var category =
+      document.getElementById('exCategory')
+      .value;
+
+    if (!data['ejercicios']) {
+
+      data['ejercicios'] = {
+        exercises: []
+      };
+
+    }
+
+    data['ejercicios'].exercises.push({
+
+      name: name,
+
+      category: category,
+
+      sets: [],
+
+      notes: ''
+
+    });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(data)
+    );
+
+    document.getElementById('exName').value = '';
+
+    renderExercises();
+
+  });
+
+renderExercises();
+
+</script>
+
+</body>
+</html>
