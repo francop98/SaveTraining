@@ -33,8 +33,8 @@
   </a>
   <a href="pages/historialEntrenamientos.html" style="text-decoration:none">
     <div class="stat-pill">
-      <div class="val">📋</div>
-      <div class="lbl">Historial</div>
+      <div class="val">🏋️</div>
+      <div class="lbl">Ejercicios</div>
     </div>
   </a>
 </div>
@@ -43,60 +43,49 @@
     <div class="card" id="cardFecha">
         <div class="section-title">Clickear para registrar entrenamiento</div>
         <div class="cal-grid" id="calGrid"></div>
-    </div>                                            
-
-
-
-<div class="card">
-    <div class="section-title">Añadir Ejercicio</div>
-    <div class="form-group">
-        <label>Nombre del ejercicio</label>
-        <input type="text" id="exName" placeholder="Ej: Press banca, Sentadilla..."/>
+    </div>
 </div>
-
-    <div class="form-group">
-        <label>Categoría</label>
-        <select id="exCategory">
-        <option value="Pecho">Pecho</option>
-        <option value="Espalda">Espalda</option>
-        <option value="Piernas">Piernas</option>
-        <option value="Hombros">Hombros</option>
-        <option value="Bíceps">Bíceps</option>
-        <option value="Tríceps">Tríceps</option>
-        <option value="Core">Core</option>
-        <option value="Cardio">Cardio</option>
-        <option value="Otro">Otro</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Series</label>
-        <div class="sets-builder" id="setsBuilder"></div>
-        <button class="btn-add-set" id="addSetBtn">+ Añadir serie</button>
-    </div>
-
-    <div class="form-group">
-        <label>Notas (opcional)</label>
-        <input type="text" id="exNotes" placeholder="Ej: Agarre ancho, pausa abajo..."/>
-    </div>
-
-    <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
+<div class="grid">
+    <div class="card">
+        <div class="section-title">Añadir Ejercicio</div>
+        <div class="form-group">
+            <label>Nombre del ejercicio</label>
+            <input type="text" id="exName" placeholder="Ej: Press banca, Sentadilla..."/>
+        </div>
+        <div class="form-group">
+            <label>Categoría</label>
+            <select id="exCategory">
+            <option value="Pecho">Pecho</option>
+            <option value="Espalda">Espalda</option>
+            <option value="Piernas">Piernas</option>
+            <option value="Hombros">Hombros</option>
+            <option value="Bíceps">Bíceps</option>
+            <option value="Tríceps">Tríceps</option>
+            <option value="Core">Core</option>
+            <option value="Cardio">Cardio</option>
+            <option value="Otro">Otro</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Series</label>
+            <div class="sets-builder" id="setsBuilder"></div>
+            <button class="btn-add-set" id="addSetBtn">+ Añadir serie</button>
+        </div>
+        <div class="form-group">
+            <label>Notas (opcional)</label>
+            <input type="text" id="exNotes" placeholder="Ej: Agarre ancho, pausa abajo..."/>
+        </div>
+        <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
     </div>
 </div>
 
-<div class="card card-full" style="margin-top: 20px;">
-    <div class="date-banner" id="dateBanner">
-    <div class="date-label" id="selectedDateLabel">Selecciona un día</div>
-    <div class="date-badge" id="trainedBadge" style="display:none">✓ DÍA ENTRENADO</div>
-    </div>
-    <div class="section-title">Ejercicios del día</div>
-    <div class="exercise-list" id="exerciseList">
-    <div class="empty-state">
-        <div class="empty-icon">📅</div>
-        <p>Selecciona un día en el calendario para ver o añadir ejercicios</p>
-    </div>
-    </div>
-</div>
+<a href="pages/historialEntrenamientos.html" style="text-decoration:none">
+  <div class="stat-pill card-full" style="margin-top:20px">
+    <div class="val">📋</div>
+    <div class="lbl">Historial</div>
+  </div>
+</a>
+
 </div>
 
 <!-- MODAL EDITAR -->
