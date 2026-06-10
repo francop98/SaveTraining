@@ -163,6 +163,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   /* ─── SETS BUILDER — Añadir ─── */
+  // COMENTADO: Card eliminada del HTML
+  /*
   function renderAddSets() {
     var container = document.getElementById('setsBuilder');
     container.innerHTML = '';
@@ -174,8 +176,11 @@ document.addEventListener('DOMContentLoaded', function () {
     addSets.push({ reps: '', weight: '' });
     renderAddSets();
   });
+  */
 
   /* ─── GUARDAR EJERCICIO ─── */
+  // COMENTADO: Card eliminada del HTML
+  /*
   document.getElementById('saveExBtn').addEventListener('click', function () {
     var name = document.getElementById('exName').value.trim();
     if (!name) { showToast('⚠ Ingresá el nombre del ejercicio'); return; }
@@ -211,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('trainedBadge').style.display = 'block';
     showToast('✓ Ejercicio guardado');
   });
+  */
 
   /* ─── LISTA DE EJERCICIOS ─── */
   function renderExerciseList() {
@@ -338,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ─── INIT ─── */
-  renderAddSets();
+  // renderAddSets(); // COMENTADO: Card eliminada del HTML
   renderWeek();
   updateTotalDays();
   var todayDate = new Date();
