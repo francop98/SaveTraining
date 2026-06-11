@@ -40,12 +40,13 @@ body::before {
   padding: 80px 20px 60px;
 }
 
+/* CAMBIO: header centrado */
 header {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   margin-bottom: 40px;
-  flex-wrap: wrap;
   gap: 12px;
 }
 
@@ -59,7 +60,8 @@ header {
 
 .logo span { color: var(--accent); }
 
-.header-stat { text-align: right; }
+/* CAMBIO: stat centrado */
+.header-stat { text-align: center; }
 
 .header-stat .count {
   font-family: 'Bebas Neue', sans-serif;
@@ -330,7 +332,6 @@ select option { background: var(--surface2); }
 
 .btn-danger:hover { background: rgba(248,113,113,0.22); }
 
-/* SVG dentro de cualquier botón de eliminar */
 .btn-danger svg,
 .btn-remove-set svg {
   width: 15px;
@@ -543,7 +544,6 @@ select option { background: var(--surface2); }
 
 .sets-builder { margin-top: 12px; }
 
-/* Set row: label | reps | weight | [repeat] | trash */
 .set-row {
   display: grid;
   grid-template-columns: auto 1fr 1fr auto auto;
@@ -552,7 +552,6 @@ select option { background: var(--surface2); }
   margin-bottom: 8px;
 }
 
-/* Cuando NO hay botón repetir (primera serie) ocupa 4 columnas */
 .set-row.no-repeat {
   grid-template-columns: auto 1fr 1fr auto;
 }
@@ -583,7 +582,6 @@ select option { background: var(--surface2); }
   background: rgba(232,255,71,0.05);
 }
 
-/* ── Cesto de basura ── */
 .btn-remove-set {
   background: transparent;
   border: none;
@@ -610,7 +608,6 @@ select option { background: var(--surface2); }
   pointer-events: none;
 }
 
-/* Botón repetir serie */
 .btn-repeat-set {
   background: transparent;
   border: 1px solid rgba(232,255,71,0.25);
@@ -679,12 +676,58 @@ select option { background: var(--surface2); }
   color: grey;
 }
 
-/* ════════════════════════════════════════════════
-   AÑADIR AL FINAL DE styles.css
-   Estilos para superseries en el builder de rutinas
-════════════════════════════════════════════════ */
+/* ── Historial: headers de agrupación ── */
+.historial-year-header {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 4px 0 2px;
+  margin-top: 12px;
+}
 
-/* Wrapper visual de superserie en el builder */
+.historial-month-header {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--text);
+  margin: 14px 0 10px;
+}
+
+/* ── Ejercicios existentes en modo libre ── */
+.ejercicios-existentes-cat {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  margin: 14px 0 6px;
+}
+
+.ejercicio-existente-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ejercicio-existente-btn:hover {
+  border-color: var(--accent);
+  background: rgba(232,255,71,0.04);
+}
+
+/* ── Superseries (rutinas builder) ── */
 .superserie-wrapper {
   border: 1px solid rgba(168, 85, 247, 0.3);
   border-radius: 14px;
@@ -706,7 +749,6 @@ select option { background: var(--surface2); }
   gap: 6px;
 }
 
-/* Ejercicio dentro de superserie */
 .ejercicio-builder-row {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -715,16 +757,13 @@ select option { background: var(--surface2); }
   margin-bottom: 10px;
 }
 
-.ejercicio-builder-row:last-child {
-  margin-bottom: 0;
-}
+.ejercicio-builder-row:last-child { margin-bottom: 0; }
 
 .ejercicio-builder-row.en-superserie {
   border-color: rgba(168, 85, 247, 0.2);
   margin-bottom: 8px;
 }
 
-/* Botón de agrupar como superserie */
 .btn-superserie {
   display: inline-flex;
   align-items: center;
@@ -755,11 +794,8 @@ select option { background: var(--surface2); }
   border-style: solid;
 }
 
-.btn-superserie.activo:hover {
-  background: rgba(168, 85, 247, 0.18);
-}
+.btn-superserie.activo:hover { background: rgba(168, 85, 247, 0.18); }
 
-/* Conector visual entre ejercicios de superserie */
 .superserie-wrapper .ejercicio-builder-row + .ejercicio-builder-row::before {
   content: '⚡';
   display: block;

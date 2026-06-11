@@ -192,6 +192,15 @@
 
   <!-- MODO LIBRE -->
   <div id="modoLibre">
+
+    <!-- Card: ejercicios existentes por categoría -->
+    <div class="card" id="cardEjerciciosExistentes" style="margin-bottom:16px">
+      <div class="section-title">Ejercicios registrados</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Clickeá uno para precargarlo en el formulario.</p>
+      <div id="listaEjerciciosExistentes"></div>
+    </div>
+
+    <!-- Card: formulario agregar ejercicio -->
     <div class="card">
       <div class="section-title">Añadir Ejercicio</div>
       <div class="form-group"><label>Nombre</label><input type="text" id="exName" placeholder="Ej: Press banca..."/></div>
@@ -206,6 +215,8 @@
       <div class="form-group"><label>Notas (opcional)</label><input type="text" id="exNotes" placeholder="Ej: Agarre ancho..."/></div>
       <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
     </div>
+
+    <!-- Lista de ejercicios agregados en esta sesión -->
     <div id="ejerciciosLibreList" style="margin-top:16px"></div>
     <button class="btn btn-primary" id="btnFinalizarLibre" style="margin-top:12px;display:none">✓ FINALIZAR ENTRENAMIENTO</button>
   </div>
@@ -223,11 +234,12 @@ var selectedDate = params.get('date') || localStorage.getItem('selectedDate');
 if (params.get('date')) localStorage.setItem('selectedDate', params.get('date'));
 
 var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var CATEGORIAS_ORDEN = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'];
 
 // Estado guiado
 var grupos = [];
 var grupoActual = 0;
-var seriesCompletadas = []; // [grupoIdx][miembroIdx][ronda] = {reps, weight}
+var seriesCompletadas = [];
 
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
@@ -259,6 +271,7 @@ if (selectedDate) {
 document.getElementById('btnLibre').addEventListener('click', function(){
   document.getElementById('modalInicio').style.display = 'none';
   document.getElementById('modoLibre').style.display = 'block';
+  renderEjerciciosExistentes();
   initModoLibre();
 });
 
@@ -306,7 +319,7 @@ document.getElementById('btnCargarRutina').addEventListener('click', function(){
   });
 
   seriesCompletadas = grupos.map(function(g){
-    return g.map(function(){ return {}; }); // ronda → {reps, weight}
+    return g.map(function(){ return {}; });
   });
 
   grupoActual = 0;
@@ -314,6 +327,64 @@ document.getElementById('btnCargarRutina').addEventListener('click', function(){
   document.getElementById('modoGuiado').style.display  = 'block';
   renderGrupo();
 });
+
+/* ── EJERCICIOS EXISTENTES (modo libre) ── */
+function getEjerciciosExistentes() {
+  var map = {};
+  Object.keys(data).forEach(function(dateKey) {
+    var day = data[dateKey];
+    if (!day.exercises) return;
+    day.exercises.forEach(function(ex) {
+      var key = ex.name.trim().toLowerCase();
+      if (!key) return;
+      if (!map[key]) map[key] = { name: ex.name, category: ex.category || 'Otro' };
+    });
+  });
+  return Object.values(map);
+}
+
+function renderEjerciciosExistentes() {
+  var container = document.getElementById('listaEjerciciosExistentes');
+  var ejercicios = getEjerciciosExistentes();
+
+  if (ejercicios.length === 0) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);padding:8px 0">Todavía no tenés ejercicios registrados.</p>';
+    return;
+  }
+
+  // Agrupar por categoría
+  var grupos = {};
+  CATEGORIAS_ORDEN.forEach(function(c) { grupos[c] = []; });
+  ejercicios.forEach(function(ex) {
+    var cat = grupos[ex.category] !== undefined ? ex.category : 'Otro';
+    grupos[cat].push(ex);
+  });
+
+  container.innerHTML = '';
+
+  CATEGORIAS_ORDEN.forEach(function(cat) {
+    if (!grupos[cat] || grupos[cat].length === 0) return;
+
+    var header = document.createElement('div');
+    header.className = 'ejercicios-existentes-cat';
+    header.textContent = cat;
+    container.appendChild(header);
+
+    grupos[cat].forEach(function(ex) {
+      var btn = document.createElement('button');
+      btn.className = 'ejercicio-existente-btn';
+      btn.textContent = ex.name;
+      btn.addEventListener('click', function() {
+        document.getElementById('exName').value = ex.name;
+        document.getElementById('exCategory').value = ex.category;
+        // Scroll al form
+        document.getElementById('exName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('exName').focus();
+      });
+      container.appendChild(btn);
+    });
+  });
+}
 
 /* ── MODO GUIADO ── */
 function renderGrupo() {
@@ -325,7 +396,6 @@ function renderGrupo() {
   var pct = Math.round((grupoActual / grupos.length) * 100);
   document.getElementById('progresoFill').style.width = pct + '%';
 
-  /* ── Header ── */
   var headerHtml = '<div class="ejercicio-header">';
   headerHtml += '<div class="ejercicio-counter">Ejercicio ' + (grupoActual+1) + ' de ' + grupos.length + '</div>';
 
@@ -352,7 +422,6 @@ function renderGrupo() {
   }
   headerHtml += '</div>';
 
-  /* ── Series ── */
   var seriesHtml = '<div class="series-lista">';
   for (var ronda = 0; ronda < maxSeries; ronda++) {
     grupo.forEach(function(ej, miembroIdx){
@@ -361,7 +430,6 @@ function renderGrupo() {
   }
   seriesHtml += '</div>';
 
-  /* ── Acciones ── */
   var esFin = grupoActual >= grupos.length - 1;
   var accionesHtml =
     '<div class="acciones-guiado">' +
@@ -372,7 +440,6 @@ function renderGrupo() {
   var wrap = document.getElementById('ejercicioActualWrap');
   wrap.innerHTML = '<div class="ejercicio-slide">' + headerHtml + seriesHtml + accionesHtml + '</div>';
 
-  /* ── Bind ── */
   wrap.querySelectorAll('.btn-check').forEach(function(btn){
     btn.addEventListener('click', function(e){
       completarSerie(parseInt(e.currentTarget.dataset.ronda), parseInt(e.currentTarget.dataset.miembro));
@@ -384,7 +451,6 @@ function renderGrupo() {
     if (confirm('¿Saltar este ejercicio?')) avanzar();
   });
 
-  /* Preview siguiente */
   var prevEl = document.getElementById('siguientePreview');
   if (grupoActual < grupos.length - 1) {
     document.getElementById('siguienteNombre').textContent = grupos[grupoActual+1].map(function(e){ return e.name; }).join(' + ');
@@ -454,7 +520,6 @@ function actualizarVisual() {
     } else if (!primeraActiva) {
       row.classList.add('activa');
       primeraActiva = true;
-      // Enfocar primer input vacío
       var inp = row.querySelector('input');
       if (inp) setTimeout(function(){ inp.focus({ preventScroll:true }); }, 50);
     }
@@ -500,6 +565,7 @@ function guardarGrupoActual() {
 
 function mostrarFin() {
   document.getElementById('modoGuiado').style.display  = 'none';
+  document.getElementById('modoLibre').style.display   = 'none';
   document.getElementById('pantallaFin').style.display = 'block';
 
   var day     = data[selectedDate] || { exercises: [] };
@@ -532,7 +598,7 @@ function initModoLibre() {
       row.innerHTML = '<span class="set-label">S'+(i+1)+'</span>' +
         '<input type="number" placeholder="Reps" value="'+(s.reps||'')+'" data-idx="'+i+'" data-field="reps"/>' +
         '<input type="number" placeholder="Peso kg" step="0.5" value="'+(s.weight||'')+'" data-idx="'+i+'" data-field="weight"/>' +
-        (i>0?'<button class="btn-repeat-set" data-idx="'+i+'">↑</button>':'') +
+        (i>0?'<button class="btn-repeat-set" data-idx="'+i+'">↑ Repetir</button>':'') +
         '<button class="btn-remove-set" data-idx="'+i+'">'+TRASH+'</button>';
       c.appendChild(row);
     });
@@ -555,10 +621,23 @@ function initModoLibre() {
   document.getElementById('saveExBtn').addEventListener('click', function(){
     var name = document.getElementById('exName').value.trim();
     if (!name){ showToast('⚠ Ingresá el nombre'); return; }
+
+    // Validar que no esté ya guardado en este día
+    var yaEnDia = ejerciciosLibre.some(function(e){ return e.name.trim().toLowerCase() === name.toLowerCase(); });
+    if (yaEnDia){ showToast('⚠ Este ejercicio ya lo agregaste hoy'); return; }
+
     var valid = addSets.filter(function(s){ return s.reps||s.weight; });
     if (!valid.length){ showToast('⚠ Añadí al menos una serie'); return; }
-    ejerciciosLibre.push({ name:name, category:document.getElementById('exCategory').value, sets:valid.map(function(s){ return {reps:s.reps||'-',weight:s.weight||'0'}; }), notes:document.getElementById('exNotes').value.trim() });
-    document.getElementById('exName').value=''; document.getElementById('exNotes').value='';
+
+    ejerciciosLibre.push({
+      name: name,
+      category: document.getElementById('exCategory').value,
+      sets: valid.map(function(s){ return {reps:s.reps||'-',weight:s.weight||'0'}; }),
+      notes: document.getElementById('exNotes').value.trim()
+    });
+
+    document.getElementById('exName').value='';
+    document.getElementById('exNotes').value='';
     addSets=[]; renderSets(); renderLibre();
     document.getElementById('btnFinalizarLibre').style.display='block';
     showToast('✓ Ejercicio guardado');
@@ -567,7 +646,9 @@ function initModoLibre() {
   function renderLibre(){
     var list=document.getElementById('ejerciciosLibreList'); list.innerHTML='';
     ejerciciosLibre.forEach(function(ex){
-      var sHtml=ex.sets.map(function(s,si){ return '<div class="set-chip"><div class="set-num">S'+(si+1)+'</div><div class="set-data"><span>'+s.reps+'</span> reps <span>'+s.weight+'kg</span></div></div>'; }).join('');
+      var sHtml=ex.sets.map(function(s,si){
+        return '<div class="set-chip"><div class="set-num">S'+(si+1)+'</div><div class="set-data"><span>'+s.reps+'</span> reps <span>'+s.weight+'kg</span></div></div>';
+      }).join('');
       var d=document.createElement('div'); d.className='card'; d.style.marginBottom='10px';
       d.innerHTML='<div class="exercise-item-header"><div style="display:flex;align-items:center;gap:8px"><div class="exercise-name">'+ex.name+'</div><div class="exercise-category">'+ex.category+'</div></div></div><div class="sets-grid" style="margin-top:8px">'+sHtml+'</div>';
       list.appendChild(d);
@@ -581,7 +662,6 @@ function initModoLibre() {
     saveData();
     grupos=ejerciciosLibre.map(function(ex){ return [ex]; });
     mostrarFin();
-    document.getElementById('modoLibre').style.display='none';
   });
 
   renderSets();
