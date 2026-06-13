@@ -208,7 +208,7 @@
         <select id="exCategory">
           <option>Pecho</option><option>Espalda</option><option>Piernas</option>
           <option>Hombros</option><option>Bíceps</option><option>Tríceps</option>
-          <option>Core</option><option>Cardio</option><option>Otro</option>
+          </option><option>Otro</option>
         </select>
       </div>
       <div class="form-group"><label>Series</label><div class="sets-builder" id="setsBuilder"></div><button class="btn-add-set" id="addSetBtn">+ Añadir serie</button></div>
@@ -234,7 +234,7 @@ var selectedDate = params.get('date') || localStorage.getItem('selectedDate');
 if (params.get('date')) localStorage.setItem('selectedDate', params.get('date'));
 
 var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-var CATEGORIAS_ORDEN = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'];
+var CATEGORIAS_ORDEN = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Otro'];
 
 // Estado guiado
 var grupos = [];
@@ -622,9 +622,17 @@ function initModoLibre() {
     var name = document.getElementById('exName').value.trim();
     if (!name){ showToast('⚠ Ingresá el nombre'); return; }
 
-    // Validar que no esté ya guardado en este día
+    // Validar que no esté ya guardado en este día (case-insensitive)
     var yaEnDia = ejerciciosLibre.some(function(e){ return e.name.trim().toLowerCase() === name.toLowerCase(); });
     if (yaEnDia){ showToast('⚠ Este ejercicio ya lo agregaste hoy'); return; }
+
+    // Validar que el nombre coincida con uno existente (case-insensitive) → usar el nombre/categoría canónicos
+    var existentes = getEjerciciosExistentes();
+    var match = existentes.find(function(ex){ return ex.name.trim().toLowerCase() === name.toLowerCase(); });
+    if (match) {
+      name = match.name; // normaliza mayúsculas/minúsculas al nombre ya registrado
+      document.getElementById('exCategory').value = match.category;
+    }
 
     var valid = addSets.filter(function(s){ return s.reps||s.weight; });
     if (!valid.length){ showToast('⚠ Añadí al menos una serie'); return; }

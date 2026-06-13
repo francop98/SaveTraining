@@ -88,54 +88,6 @@
   transition: max-height 0.25s ease;
 }
 
-.set-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 8px;
-  background: var(--surface);
-  border-radius: 8px;
-}
-
-.set-label {
-  font-weight: 600;
-  font-size: 12px;
-  min-width: 30px;
-  color: var(--text-muted);
-}
-
-.set-row input {
-  flex: 1;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface2);
-  color: var(--text);
-}
-
-.btn-remove-set {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.btn-add-set {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  background: var(--primary);
-  color: var(--text-on-primary);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
 .set-chip {
   background: var(--surface);
   padding: 8px 12px;
@@ -154,6 +106,67 @@
 .set-data {
   color: var(--text-muted);
   font-size: 11px;
+}
+
+/* Cards de categoría (nivel 1) */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.cat-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cat-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.cat-card-nombre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1.5px;
+  color: var(--text);
+}
+
+.cat-card-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Botón volver (nivel 2) */
+.btn-volver-cat {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-volver-cat:hover { color: var(--text); }
+
+.cat-actual-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1.5px;
+  color: var(--text);
+  margin-bottom: 12px;
 }
 
 </style>
@@ -190,48 +203,19 @@
 
   <div id="createForm">
 
-    <div class="form-group">
-      <label>Nombre del ejercicio</label>
-      <input
-        type="text"
-        id="exName"
-        placeholder="Ej: Press banca"
-      />
-    </div>
+    <div class="section-title">Añadir Ejercicio</div>
 
-    <div class="form-group">
-      <label>Categoría</label>
+    <div class="form-group"><label>Nombre</label><input type="text" id="exName" placeholder="Ej: Press banca..."/></div>
+    <div class="form-group"><label>Categoría</label>
       <select id="exCategory">
-        <option value="Pecho">Pecho</option>
-        <option value="Espalda">Espalda</option>
-        <option value="Piernas">Piernas</option>
-        <option value="Hombros">Hombros</option>
-        <option value="Bíceps">Bíceps</option>
-        <option value="Tríceps">Tríceps</option>
-        <option value="Core">Core</option>
-        <option value="Cardio">Cardio</option>
-        <option value="Otro">Otro</option>
+        <option>Pecho</option><option>Espalda</option><option>Piernas</option>
+        <option>Hombros</option><option>Bíceps</option><option>Tríceps</option>
+        <option>Core</option><option>Cardio</option><option>Otro</option>
       </select>
     </div>
-
-    <div class="form-group">
-      <label>Series (Reps x Kg)</label>
-      <div class="sets-builder" id="setsBuilder"></div>
-      <button
-        type="button"
-        class="btn-add-set"
-        id="addSetBtn"
-      >
-        + Añadir serie
-      </button>
-    </div>
-
-    <button
-      class="btn btn-primary"
-      id="saveExerciseBtn"
-    >
-      GUARDAR EJERCICIO
-    </button>
+    <div class="form-group"><label>Series</label><div class="sets-builder" id="setsBuilder"></div><button class="btn-add-set" id="addSetBtn">+ Añadir serie</button></div>
+    <div class="form-group"><label>Notas (opcional)</label><input type="text" id="exNotes" placeholder="Ej: Agarre ancho..."/></div>
+    <button class="btn btn-primary" id="saveExerciseBtn">GUARDAR EJERCICIO</button>
 
   </div>
 </div>
@@ -241,11 +225,20 @@
     EJERCICIOS REGISTRADOS
   </button>
   <div id="exerciseContainer" style="display:none; margin-top:16px;">
-    <div class="exercise-listing" id="exerciseListing"></div>
+    <div id="vistaCategorias">
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+    <div id="vistaEjercicios" style="display:none;">
+      <button class="btn-volver-cat" id="btnVolverCat">← Volver a grupos musculares</button>
+      <div class="cat-actual-titulo" id="catActualTitulo"></div>
+      <div class="exercise-listing" id="exerciseListing"></div>
+    </div>
   </div>
 </div>
 
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 
@@ -255,53 +248,15 @@ var data = JSON.parse(
   localStorage.getItem(STORAGE_KEY) || '{}'
 );
 
-var addSets = [];
+var categoriaActiva = null; // null = todas
 
-var TRASH_SVG =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-    '<polyline points="3 6 5 6 21 6"/>' +
-    '<path d="M19 6l-1 14H6L5 6"/>' +
-    '<path d="M10 11v6"/>' +
-    '<path d="M14 11v6"/>' +
-    '<path d="M9 6V4h6v2"/>' +
-  '</svg>';
+var CATEGORIAS_ORDEN = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'];
 
-function buildSetRow(set, i, isFirst) {
-  var row = document.createElement('div');
-  row.className = 'set-row' + (isFirst ? ' no-repeat' : '');
-  row.innerHTML =
-    '<span class="set-label">S' + (i + 1) + '</span>' +
-    '<input type="number" placeholder="Reps" min="1" value="' + (set.reps || '') + '" data-idx="' + i + '" data-field="reps"/>' +
-    '<input type="number" placeholder="Peso kg" min="0" step="0.5" value="' + (set.weight || '') + '" data-idx="' + i + '" data-field="weight"/>' +
-    '<button class="btn-remove-set" data-idx="' + i + '" title="Eliminar serie">' + TRASH_SVG + '</button>';
-  return row;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
-
-function bindSetEvents(container, setsArr, rerenderFn) {
-  container.querySelectorAll('input').forEach(function (inp) {
-    inp.addEventListener('input', function (e) {
-      setsArr[parseInt(e.target.dataset.idx)][e.target.dataset.field] = e.target.value;
-    });
-  });
-  container.querySelectorAll('.btn-remove-set').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      setsArr.splice(parseInt(e.currentTarget.dataset.idx), 1);
-      rerenderFn();
-    });
-  });
-}
-
-function renderAddSets() {
-  var container = document.getElementById('setsBuilder');
-  container.innerHTML = '';
-  addSets.forEach(function (set, i) { container.appendChild(buildSetRow(set, i, i === 0)); });
-  bindSetEvents(container, addSets, renderAddSets);
-}
-
-document.getElementById('addSetBtn').addEventListener('click', function () {
-  addSets.push({ reps: '', weight: '' });
-  renderAddSets();
-});
 
 function getUniqueExercises() {
 
@@ -337,7 +292,56 @@ function getUniqueExercises() {
 
 }
 
-function renderExercises() {
+function renderCatGrid(exercises) {
+
+  var grid = document.getElementById('catGrid');
+  grid.innerHTML = '';
+
+  var counts = {};
+  exercises.forEach(function(ex) {
+    var cat = ex.category || 'Otro';
+    counts[cat] = (counts[cat] || 0) + 1;
+  });
+
+  var categoriasPresentes = CATEGORIAS_ORDEN.filter(function(c) { return counts[c]; });
+
+  if (categoriasPresentes.length === 0) {
+    grid.innerHTML = '<div class="empty-exercises">Todavía no registraste ejercicios.</div>';
+    return;
+  }
+
+  categoriasPresentes.forEach(function(cat) {
+    var card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML =
+      '<div class="cat-card-nombre">' + cat + '</div>' +
+      '<div class="cat-card-count">' + counts[cat] + ' ejercicio(s)</div>';
+    card.addEventListener('click', function() {
+      categoriaActiva = cat;
+      mostrarVistaEjercicios();
+    });
+    grid.appendChild(card);
+  });
+
+}
+
+function mostrarVistaEjercicios() {
+  document.getElementById('vistaCategorias').style.display = 'none';
+  document.getElementById('vistaEjercicios').style.display = 'block';
+  document.getElementById('catActualTitulo').textContent = categoriaActiva;
+  renderExercisesList();
+}
+
+function mostrarVistaCategorias() {
+  categoriaActiva = null;
+  document.getElementById('vistaEjercicios').style.display = 'none';
+  document.getElementById('vistaCategorias').style.display = 'block';
+  renderCatGrid(getUniqueExercises());
+}
+
+document.getElementById('btnVolverCat').addEventListener('click', mostrarVistaCategorias);
+
+function renderExercisesList() {
 
   var exercises = getUniqueExercises();
 
@@ -346,25 +350,27 @@ function renderExercises() {
 
   container.innerHTML = '';
 
-  if (exercises.length === 0) {
+  var visibles = exercises.filter(function(ex) { return (ex.category || 'Otro') === categoriaActiva; });
+
+  if (visibles.length === 0) {
 
     container.innerHTML =
 
       '<div class="empty-exercises">' +
-      'Todavía no registraste ejercicios.' +
+      'No hay ejercicios en esta categoría.' +
       '</div>';
 
     return;
 
   }
 
-  exercises.sort(function(a, b) {
+  visibles.sort(function(a, b) {
 
     return a.name.localeCompare(b.name);
 
   });
 
-  exercises.forEach(function(ex) {
+  visibles.forEach(function(ex) {
 
     var div = document.createElement('div');
 
@@ -399,92 +405,113 @@ function renderExercises() {
 
 }
 
-document
-  .getElementById('toggleCreateBtn')
-  .addEventListener('click', function() {
-
-    var form =
-      document.getElementById('createForm');
-
-    form.style.display =
-      form.style.display === 'block'
-        ? 'none'
-        : 'block';
-
-    if (form.style.display === 'block') {
-      document.getElementById('exName').value = '';
-      document.getElementById('exCategory').value = 'Otro';
-      addSets = [];
-      renderAddSets();
-    }
-
-  });
+function renderExercises() {
+  mostrarVistaCategorias();
+}
 
 document
   .getElementById('toggleListBtn')
   .addEventListener('click', function() {
 
     var container = document.getElementById('exerciseContainer');
-    container.style.display =
-      container.style.display === 'block'
-        ? 'none'
-        : 'block';
+    var abriendo = container.style.display !== 'block';
+    container.style.display = abriendo ? 'block' : 'none';
 
-  });
-
-document
-  .getElementById('saveExerciseBtn')
-  .addEventListener('click', function() {
-
-    var name =
-      document.getElementById('exName')
-      .value
-      .trim();
-
-    if (!name) return;
-
-    var category =
-      document.getElementById('exCategory')
-      .value;
-
-    var validSets = addSets.filter(function (s) { return s.reps || s.weight; });
-
-    if (!data['ejercicios']) {
-
-      data['ejercicios'] = {
-        exercises: []
-      };
-
+    if (abriendo) {
+      mostrarVistaCategorias();
     }
 
-    data['ejercicios'].exercises.push({
+  });
 
-      name: name,
+/* ════════════════════════════════════════════
+   AÑADIR EJERCICIO — copiado de modo libre
+   (registrarEntrenamiento.html)
+════════════════════════════════════════════ */
 
-      category: category,
+var addSets = [];
+var TRASH = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
 
-      sets: validSets.map(function (s) { return { reps: s.reps || '', weight: s.weight || '' }; }),
-
-      notes: ''
-
+function renderSets() {
+  var c = document.getElementById('setsBuilder'); c.innerHTML = '';
+  addSets.forEach(function(s,i){
+    var row = document.createElement('div');
+    row.className = 'set-row' + (i===0?' no-repeat':'');
+    row.innerHTML = '<span class="set-label">S'+(i+1)+'</span>' +
+      '<input type="number" placeholder="Reps" value="'+(s.reps||'')+'" data-idx="'+i+'" data-field="reps"/>' +
+      '<input type="number" placeholder="Peso kg" step="0.5" value="'+(s.weight||'')+'" data-idx="'+i+'" data-field="weight"/>' +
+      (i>0?'<button class="btn-repeat-set" data-idx="'+i+'">↑ Repetir</button>':'') +
+      '<button class="btn-remove-set" data-idx="'+i+'">'+TRASH+'</button>';
+    c.appendChild(row);
+  });
+  c.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('input', function(e){ addSets[+e.target.dataset.idx][e.target.dataset.field]=e.target.value; });
+  });
+  c.querySelectorAll('.btn-remove-set').forEach(function(b){
+    b.addEventListener('click', function(e){ addSets.splice(+e.currentTarget.dataset.idx,1); renderSets(); });
+  });
+  c.querySelectorAll('.btn-repeat-set').forEach(function(b){
+    b.addEventListener('click', function(e){
+      var idx=+e.currentTarget.dataset.idx; var p=addSets[idx-1];
+      if(p){ addSets[idx]={reps:p.reps,weight:p.weight}; renderSets(); }
     });
+  });
+}
 
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(data)
-    );
+document.getElementById('addSetBtn').addEventListener('click', function(){ addSets.push({reps:'',weight:''}); renderSets(); });
 
-    document.getElementById('exName').value = '';
-    document.getElementById('exCategory').value = 'Otro';
-    addSets = [];
-    renderAddSets();
+document
+  .getElementById('toggleCreateBtn')
+  .addEventListener('click', function() {
 
     var form = document.getElementById('createForm');
-    form.style.display = 'none';
 
-    renderExercises();
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+
+    if (form.style.display === 'block') {
+      document.getElementById('exName').value = '';
+      document.getElementById('exCategory').value = 'Pecho';
+      document.getElementById('exNotes').value = '';
+      addSets = [];
+      renderSets();
+    }
 
   });
+
+document.getElementById('saveExerciseBtn').addEventListener('click', function(){
+  var name = document.getElementById('exName').value.trim();
+  if (!name){ showToast('⚠ Ingresá el nombre'); return; }
+
+  // Validar duplicado (case-insensitive) contra ejercicios ya registrados
+  var existentes = getUniqueExercises();
+  var lower = name.toLowerCase();
+  var yaExiste = existentes.some(function(ex){ return ex.name.trim().toLowerCase() === lower; });
+  if (yaExiste){ showToast('⚠ Ya existe este ejercicio registrado'); return; }
+
+  var valid = addSets.filter(function(s){ return s.reps||s.weight; });
+  if (!valid.length){ showToast('⚠ Añadí al menos una serie'); return; }
+
+  if (!data['ejercicios']) {
+    data['ejercicios'] = { exercises: [] };
+  }
+
+  data['ejercicios'].exercises.push({
+    name: name,
+    category: document.getElementById('exCategory').value,
+    sets: valid.map(function(s){ return {reps:s.reps||'-',weight:s.weight||'0'}; }),
+    notes: document.getElementById('exNotes').value.trim()
+  });
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  document.getElementById('exName').value='';
+  document.getElementById('exNotes').value='';
+  addSets=[]; renderSets();
+
+  document.getElementById('createForm').style.display = 'none';
+
+  mostrarVistaCategorias();
+  showToast('✓ Ejercicio guardado');
+});
 
 renderExercises();
 

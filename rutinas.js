@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
       '<div class="form-group">' +
       '<label>Categoría</label>' +
       '<select data-idx="' + i + '" data-field="category">' +
-      ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'].map(function (c) {
+      ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Otro'].map(function (c) {
         return '<option value="' + c + '"' + (ejerciciosActuales[i].category === c ? ' selected' : '') + '>' + c + '</option>';
       }).join('') +
       '</select>' +

@@ -6,6 +6,82 @@
   <title>Historial</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    .mes-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .mes-header:hover { border-color: var(--accent); background: rgba(232,255,71,0.03); }
+    .mes-header.abierto {
+      border-color: rgba(232,255,71,0.3);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-bottom: 0;
+    }
+    .mes-nombre { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:var(--text); }
+    .mes-meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .mes-chevron { font-size:18px; color:var(--text-muted); transition:transform 0.2s; flex-shrink:0; }
+    .mes-header.abierto .mes-chevron { transform:rotate(180deg); color:var(--accent); }
+
+    .mes-body {
+      display: none;
+      border: 1px solid rgba(232,255,71,0.3);
+      border-top: none;
+      border-bottom-left-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .mes-body.abierto { display: block; }
+
+    .dia-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      gap: 10px;
+    }
+    .dia-row:last-of-type { border-bottom: none; }
+    .dia-row:hover { background: rgba(232,255,71,0.04); }
+    .dia-row.abierto { background: rgba(232,255,71,0.05); }
+
+    .dia-info { flex:1; min-width:0; }
+    .dia-fecha { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:1px; color:var(--accent); }
+    .dia-stats { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .dia-stats strong { color:var(--text); }
+    .dia-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+    .dia-detalle {
+      display: none;
+      padding: 14px 20px 16px;
+      background: rgba(0,0,0,0.15);
+      border-top: 1px solid var(--border);
+      animation: fadeDown 0.2s ease;
+    }
+    .dia-detalle.abierto { display: block; }
+    @keyframes fadeDown {
+      from { opacity:0; transform:translateY(-6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .anio-header {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:13px; letter-spacing:3px; color:var(--text-muted);
+      text-transform:uppercase; padding:8px 0 4px; margin-top:8px;
+    }
+  </style>
 </head>
 <body>
 
@@ -31,148 +107,144 @@ var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','
 
 var TRASH_SVG =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:middle;pointer-events:none">' +
-  '<polyline points="3 6 5 6 21 6"/>' +
-  '<path d="M19 6l-1 14H6L5 6"/>' +
-  '<path d="M10 11v6"/>' +
-  '<path d="M14 11v6"/>' +
-  '<path d="M9 6V4h6v2"/>' +
-  '</svg>';
+  '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>' +
+  '<path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
 
 function showToast(msg) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function () { t.classList.remove('show'); }, 2200);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+function construirDetalleHtml(dateKey) {
+  var day = data[dateKey];
+  if (!day || !day.exercises || !day.exercises.length)
+    return '<p style="font-size:13px;color:var(--text-muted)">Sin ejercicios registrados.</p>';
+  return '<div class="exercise-list">' +
+    day.exercises.map(function(ex) {
+      var setsHtml = ex.sets.map(function(s, si) {
+        return '<div class="set-chip">' +
+          '<div class="set-num">Serie ' + (si+1) + '</div>' +
+          '<div class="set-data"><span>' + s.reps + '</span> reps <span>' + s.weight + 'kg</span></div>' +
+          '</div>';
+      }).join('');
+      return '<div class="exercise-item" style="margin-bottom:8px">' +
+        '<div class="exercise-item-header"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+        '<div class="exercise-name">' + ex.name + '</div>' +
+        '<div class="exercise-category">' + ex.category + '</div>' +
+        '</div></div>' +
+        '<div class="sets-grid">' + setsHtml + '</div>' +
+        (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">📝 ' + ex.notes + '</div>' : '') +
+        '</div>';
+    }).join('') + '</div>';
 }
 
 function renderHistorial() {
   var container = document.getElementById('historialContainer');
 
   var diasEntrenados = Object.keys(data)
-    .filter(function (key) { return data[key] && data[key].trained; })
-    .sort(function (a, b) { return b.localeCompare(a); });
+    .filter(function(key){ return data[key] && data[key].trained; })
+    .sort(function(a, b){ return b.localeCompare(a); });
 
-  if (diasEntrenados.length === 0) {
-    container.innerHTML =
-      '<div class="empty-state">' +
-      '<div class="empty-icon">📅</div>' +
-      '<p>No hay entrenamientos registrados todavía.</p>' +
-      '</div>';
+  if (!diasEntrenados.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>No hay entrenamientos registrados todavía.</p></div>';
     return;
   }
 
-  // Detectar si hay más de un año para mostrar header de año
-  var años = [];
+  // Detectar multi-año
+  var anios = [];
   diasEntrenados.forEach(function(k) {
     var a = k.split('-')[0];
-    if (años.indexOf(a) === -1) años.push(a);
+    if (anios.indexOf(a) === -1) anios.push(a);
   });
-  var multiAño = años.length > 1;
+  var multiAnio = anios.length > 1;
 
-  // Agrupar por "YYYY-MM"
-  var grupos = {};
-  var ordenGrupos = [];
+  // Agrupar por YYYY-MM
+  var grupos = {}, ordenGrupos = [];
   diasEntrenados.forEach(function(dateKey) {
     var p = dateKey.split('-');
-    var grupoKey = p[0] + '-' + p[1];
-    if (!grupos[grupoKey]) {
-      grupos[grupoKey] = [];
-      ordenGrupos.push(grupoKey);
-    }
-    grupos[grupoKey].push(dateKey);
+    var gk = p[0] + '-' + p[1];
+    if (!grupos[gk]) { grupos[gk] = []; ordenGrupos.push(gk); }
+    grupos[gk].push(dateKey);
   });
 
   container.innerHTML = '';
-  var ultimoAño = null;
+  var ultimoAnio = null;
 
-  ordenGrupos.forEach(function(grupoKey) {
+  ordenGrupos.forEach(function(grupoKey, gi) {
     var p = grupoKey.split('-');
-    var año = p[0];
+    var anio = p[0];
     var mesIdx = parseInt(p[1]) - 1;
+    var diasDelMes = grupos[grupoKey];
 
-    // Header de año (solo si hay más de uno, y solo la primera vez que aparece)
-    if (multiAño && año !== ultimoAño) {
-      var añoHeader = document.createElement('div');
-      añoHeader.className = 'historial-year-header';
-      añoHeader.textContent = año;
-      container.appendChild(añoHeader);
-      ultimoAño = año;
+    // Header de año
+    if (multiAnio && anio !== ultimoAnio) {
+      var anioEl = document.createElement('div');
+      anioEl.className = 'anio-header';
+      anioEl.textContent = anio;
+      container.appendChild(anioEl);
+      ultimoAnio = anio;
     }
 
-    // Header de mes
-    var mesHeader = document.createElement('div');
-    mesHeader.className = 'historial-month-header';
-    mesHeader.textContent = MESES[mesIdx];
-    container.appendChild(mesHeader);
+    // Totales del mes para el resumen
+    var totalEj = diasDelMes.reduce(function(acc, dk) {
+      return acc + ((data[dk].exercises && data[dk].exercises.length) || 0);
+    }, 0);
 
-    // Cards del mes
-    grupos[grupoKey].forEach(function(dateKey) {
+    // ── Mes header ──
+    var mesHeader = document.createElement('div');
+    mesHeader.className = 'mes-header' + (gi === 0 ? ' abierto' : '');
+    mesHeader.innerHTML =
+      '<div>' +
+        '<div class="mes-nombre">' + MESES[mesIdx] + ' ' + anio + '</div>' +
+        '<div class="mes-meta">' + diasDelMes.length + ' día(s) entrenado(s) · ' + totalEj + ' ejercicio(s)</div>' +
+      '</div>' +
+      '<div class="mes-chevron">▾</div>';
+
+    // ── Mes body ──
+    var mesBody = document.createElement('div');
+    mesBody.className = 'mes-body' + (gi === 0 ? ' abierto' : '');
+
+    mesHeader.addEventListener('click', function() {
+      var open = mesHeader.classList.contains('abierto');
+      mesHeader.classList.toggle('abierto', !open);
+      mesBody.classList.toggle('abierto', !open);
+    });
+
+    // ── Días ──
+    diasDelMes.forEach(function(dateKey) {
       var day = data[dateKey];
       var parts = dateKey.split('-');
-      var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      var dd = parts[2];
-      var mm = parts[1];
-      var yyyy = parts[0];
+      var dateObj = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+      var dd = parts[2], mm = parts[1], yyyy = parts[0];
       var dayName = DAY_FULL[dateObj.getDay()];
+      var totalSeries = day.exercises.reduce(function(acc, ex){ return acc + ex.sets.length; }, 0);
 
-      var totalSeries = day.exercises.reduce(function (acc, ex) {
-        return acc + ex.sets.length;
-      }, 0);
-
-      var card = document.createElement('div');
-      card.className = 'card';
-      card.style.marginBottom = '10px';
-      card.style.cursor = 'pointer';
-
-      card.innerHTML =
-        '<div class="date-banner" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between">' +
-        '<div class="date-label">' + dayName + ' ' + dd + '/' + mm + (multiAño ? '/' + yyyy : '') + '</div>' +
-        '<div style="display:flex;gap:8px;align-items:center">' +
-        '<div class="date-badge">✓ DÍA ENTRENADO</div>' +
-        '<button class="btn btn-sm btn-danger" id="btn-del-' + dateKey + '" title="Eliminar entrenamiento">' + TRASH_SVG + '</button>' +
+      var diaRow = document.createElement('div');
+      diaRow.className = 'dia-row';
+      diaRow.innerHTML =
+        '<div class="dia-info">' +
+          '<div class="dia-fecha">' + dayName + ' ' + dd + '/' + mm + (multiAnio ? '/' + yyyy : '') + '</div>' +
+          '<div class="dia-stats"><strong>' + day.exercises.length + '</strong> ejercicios · <strong>' + totalSeries + '</strong> series</div>' +
         '</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">' +
-        '<span style="font-size:12px;color:var(--text-muted)">💪 <strong style="color:var(--accent)">' + day.exercises.length + '</strong> ejercicios</span>' +
-        '<span style="font-size:12px;color:var(--text-muted)">🔁 <strong style="color:var(--accent)">' + totalSeries + '</strong> series</span>' +
+        '<div class="dia-actions">' +
+          '<button class="btn btn-sm btn-danger" data-key="' + dateKey + '" title="Eliminar">' + TRASH_SVG + '</button>' +
         '</div>';
 
-      container.appendChild(card);
+      var diaDetalle = document.createElement('div');
+      diaDetalle.className = 'dia-detalle';
+      diaDetalle.innerHTML = construirDetalleHtml(dateKey);
 
-      // Expandir detalle al clickear la card
-      card.addEventListener('click', function () {
-        var detalle = card.querySelector('.detalle-entrenamiento');
-        if (detalle) { detalle.remove(); return; }
-
-        var ejerciciosHtml = data[dateKey].exercises.map(function (ex) {
-          var setsHtml = ex.sets.map(function (s, si) {
-            return '<div class="set-chip">' +
-              '<div class="set-num">Serie ' + (si + 1) + '</div>' +
-              '<div class="set-data"><span>' + s.reps + '</span> reps <span>' + s.weight + 'kg</span></div>' +
-              '</div>';
-          }).join('');
-
-          return '<div class="exercise-item" style="margin-bottom:8px">' +
-            '<div class="exercise-item-header">' +
-            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-            '<div class="exercise-name">' + ex.name + '</div>' +
-            '<div class="exercise-category">' + ex.category + '</div>' +
-            '</div>' +
-            '</div>' +
-            '<div class="sets-grid">' + setsHtml + '</div>' +
-            (ex.notes ? '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">📝 ' + ex.notes + '</div>' : '') +
-            '</div>';
-        }).join('');
-
-        var detalle = document.createElement('div');
-        detalle.className = 'detalle-entrenamiento';
-        detalle.style.marginTop = '16px';
-        detalle.innerHTML = '<div class="exercise-list">' + ejerciciosHtml + '</div>';
-        card.appendChild(detalle);
+      // Toggle detalle al clickear la fila
+      diaRow.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-danger')) return;
+        var open = diaDetalle.classList.contains('abierto');
+        diaDetalle.classList.toggle('abierto', !open);
+        diaRow.classList.toggle('abierto', !open);
       });
 
-      // Botón eliminar
-      document.getElementById('btn-del-' + dateKey).addEventListener('click', function (e) {
+      // Eliminar
+      diaRow.querySelector('.btn-danger').addEventListener('click', function(e) {
         e.stopPropagation();
         if (!confirm('¿Eliminar el entrenamiento del ' + dayName + ' ' + dd + '/' + mm + '/' + yyyy + '?')) return;
         delete data[dateKey];
@@ -180,7 +252,13 @@ function renderHistorial() {
         renderHistorial();
         showToast('Entrenamiento eliminado');
       });
+
+      mesBody.appendChild(diaRow);
+      mesBody.appendChild(diaDetalle);
     });
+
+    container.appendChild(mesHeader);
+    container.appendChild(mesBody);
   });
 }
 
