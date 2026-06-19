@@ -193,7 +193,7 @@ function renderHistorial() {
 
     // ── Mes header ──
     var mesHeader = document.createElement('div');
-    mesHeader.className = 'mes-header' + (gi === 0 ? ' abierto' : '');
+    mesHeader.className = 'mes-header';
     mesHeader.innerHTML =
       '<div>' +
         '<div class="mes-nombre">' + MESES[mesIdx] + ' ' + anio + '</div>' +
@@ -203,7 +203,7 @@ function renderHistorial() {
 
     // ── Mes body ──
     var mesBody = document.createElement('div');
-    mesBody.className = 'mes-body' + (gi === 0 ? ' abierto' : '');
+    mesBody.className = 'mes-body';
 
     mesHeader.addEventListener('click', function() {
       var open = mesHeader.classList.contains('abierto');

@@ -34,11 +34,9 @@
     .back-link { background:transparent; border:none; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; padding:0; margin-top:10px; display:block; text-align:center; transition:color 0.15s; }
     .back-link:hover { color:var(--text); }
 
-    /* Progreso */
     .progreso-bar-wrap { background:var(--surface2); border-radius:99px; height:6px; margin-bottom:28px; overflow:hidden; }
     .progreso-bar-fill { height:100%; background:var(--accent); border-radius:99px; transition:width 0.5s ease; }
 
-    /* Header ejercicio */
     .ejercicio-counter { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); font-weight:600; margin-bottom:6px; }
     .ejercicio-nombre { font-family:'Bebas Neue',sans-serif; font-size:clamp(34px,8vw,58px); letter-spacing:2px; line-height:1; color:var(--text); }
     .ejercicio-categoria {
@@ -54,7 +52,6 @@
     }
     .ejercicio-header { margin-bottom:24px; }
 
-    /* Series */
     .series-lista { display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
     .serie-row {
       background:var(--surface2); border:1px solid var(--border); border-radius:14px;
@@ -80,7 +77,6 @@
     .serie-sugerencia { font-size:10px; color:var(--text-muted); margin-top:2px; }
     .serie-sugerencia strong { color:var(--accent); }
 
-    /* Botón check */
     .btn-check {
       width:40px; height:40px; border-radius:50%; border:2px solid var(--border);
       background:transparent; cursor:pointer; display:flex; align-items:center;
@@ -90,7 +86,6 @@
     .serie-row.completada .btn-check { border-color:var(--green); background:var(--green); color:#0d0d0f; pointer-events:none; }
     .btn-check svg { pointer-events:none; }
 
-    /* Acciones */
     .acciones-guiado { display:flex; gap:10px; flex-wrap:wrap; }
     .btn-siguiente {
       flex:1; background:var(--accent); color:#0d0d0f; border:none; border-radius:10px;
@@ -108,7 +103,6 @@
     .siguiente-preview { margin-top:18px; padding:12px 16px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; font-size:12px; color:var(--text-muted); }
     .siguiente-preview strong { color:var(--text); font-size:13px; }
 
-    /* Pantalla fin */
     #pantallaFin { display:none; text-align:center; padding:20px 0 40px; animation:fadeUp 0.5s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
     .fin-emoji { font-size:80px; margin-bottom:18px; display:block; animation:bounce 0.6s ease 0.3s both; }
@@ -122,11 +116,9 @@
     .fin-stat .lbl { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; margin-top:4px; }
     .fin-acciones { display:flex; flex-direction:column; gap:10px; max-width:320px; margin:0 auto; }
 
-    /* Slide animation */
     .ejercicio-slide { animation:slideIn 0.3s ease; }
     @keyframes slideIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:translateX(0)} }
 
-    /* Modo libre */
     #modoLibre { display:none; }
   </style>
 </head>
@@ -141,7 +133,6 @@
     <div class="logo">REGISTRAR<span><br>ENTRENAMIENTO</span></div>
   </header>
 
-  <!-- MODAL INICIO -->
   <div class="modal-overlay" id="modalInicio" style="display:flex">
     <div class="modal-inicio">
       <div class="modal-title">¿Cómo empezamos?</div>
@@ -165,7 +156,6 @@
     </div>
   </div>
 
-  <!-- MODO GUIADO -->
   <div id="modoGuiado" style="display:none">
     <div class="progreso-bar-wrap"><div class="progreso-bar-fill" id="progresoFill" style="width:0%"></div></div>
     <div id="ejercicioActualWrap"></div>
@@ -174,7 +164,6 @@
     </div>
   </div>
 
-  <!-- PANTALLA FIN -->
   <div id="pantallaFin">
     <span class="fin-emoji">🏆</span>
     <div class="fin-titulo">¡FELICITACIONES!<br><span>ENTRENAMIENTO</span><br>COMPLETADO</div>
@@ -190,17 +179,12 @@
     </div>
   </div>
 
-  <!-- MODO LIBRE -->
   <div id="modoLibre">
-
-    <!-- Card: ejercicios existentes por categoría -->
     <div class="card" id="cardEjerciciosExistentes" style="margin-bottom:16px">
       <div class="section-title">Ejercicios registrados</div>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Clickeá uno para precargarlo en el formulario.</p>
       <div id="listaEjerciciosExistentes"></div>
     </div>
-
-    <!-- Card: formulario agregar ejercicio -->
     <div class="card">
       <div class="section-title">Añadir Ejercicio</div>
       <div class="form-group"><label>Nombre</label><input type="text" id="exName" placeholder="Ej: Press banca..."/></div>
@@ -208,15 +192,13 @@
         <select id="exCategory">
           <option>Pecho</option><option>Espalda</option><option>Piernas</option>
           <option>Hombros</option><option>Bíceps</option><option>Tríceps</option>
-          </option><option>Otro</option>
+          <option>Core</option><option>Cardio</option><option>Otro</option>
         </select>
       </div>
       <div class="form-group"><label>Series</label><div class="sets-builder" id="setsBuilder"></div><button class="btn-add-set" id="addSetBtn">+ Añadir serie</button></div>
       <div class="form-group"><label>Notas (opcional)</label><input type="text" id="exNotes" placeholder="Ej: Agarre ancho..."/></div>
       <button class="btn btn-primary" id="saveExBtn">GUARDAR EJERCICIO</button>
     </div>
-
-    <!-- Lista de ejercicios agregados en esta sesión -->
     <div id="ejerciciosLibreList" style="margin-top:16px"></div>
     <button class="btn btn-primary" id="btnFinalizarLibre" style="margin-top:12px;display:none">✓ FINALIZAR ENTRENAMIENTO</button>
   </div>
@@ -234,9 +216,8 @@ var selectedDate = params.get('date') || localStorage.getItem('selectedDate');
 if (params.get('date')) localStorage.setItem('selectedDate', params.get('date'));
 
 var DAY_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-var CATEGORIAS_ORDEN = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Otro'];
+var CATEGORIAS_ORDEN = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'];
 
-// Estado guiado
 var grupos = [];
 var grupoActual = 0;
 var seriesCompletadas = [];
@@ -328,7 +309,7 @@ document.getElementById('btnCargarRutina').addEventListener('click', function(){
   renderGrupo();
 });
 
-/* ── EJERCICIOS EXISTENTES (modo libre) ── */
+/* ── EJERCICIOS EXISTENTES ── */
 function getEjerciciosExistentes() {
   var map = {};
   Object.keys(data).forEach(function(dateKey) {
@@ -352,32 +333,28 @@ function renderEjerciciosExistentes() {
     return;
   }
 
-  // Agrupar por categoría
-  var grupos = {};
-  CATEGORIAS_ORDEN.forEach(function(c) { grupos[c] = []; });
+  var gruposMap = {};
+  CATEGORIAS_ORDEN.forEach(function(c) { gruposMap[c] = []; });
   ejercicios.forEach(function(ex) {
-    var cat = grupos[ex.category] !== undefined ? ex.category : 'Otro';
-    grupos[cat].push(ex);
+    var cat = gruposMap[ex.category] !== undefined ? ex.category : 'Otro';
+    gruposMap[cat].push(ex);
   });
 
   container.innerHTML = '';
 
   CATEGORIAS_ORDEN.forEach(function(cat) {
-    if (!grupos[cat] || grupos[cat].length === 0) return;
-
+    if (!gruposMap[cat] || gruposMap[cat].length === 0) return;
     var header = document.createElement('div');
     header.className = 'ejercicios-existentes-cat';
     header.textContent = cat;
     container.appendChild(header);
-
-    grupos[cat].forEach(function(ex) {
+    gruposMap[cat].forEach(function(ex) {
       var btn = document.createElement('button');
       btn.className = 'ejercicio-existente-btn';
       btn.textContent = ex.name;
       btn.addEventListener('click', function() {
         document.getElementById('exName').value = ex.name;
         document.getElementById('exCategory').value = ex.category;
-        // Scroll al form
         document.getElementById('exName').scrollIntoView({ behavior: 'smooth', block: 'center' });
         document.getElementById('exName').focus();
       });
@@ -400,22 +377,46 @@ function renderGrupo() {
   headerHtml += '<div class="ejercicio-counter">Ejercicio ' + (grupoActual+1) + ' de ' + grupos.length + '</div>';
 
   if (esSuper) {
-    headerHtml += '<div class="ejercicio-nombre">' + grupo[0].name + '</div>';
-    headerHtml += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
-    headerHtml += '<div class="ejercicio-categoria">' + grupo[0].category + '</div>';
-    headerHtml += '<span class="superserie-badge">⚡ SUPERSERIE</span>';
-    headerHtml += '</div>';
-    headerHtml += '<div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-    headerHtml += '<span style="font-size:12px;color:var(--text-muted)">con</span>';
-    headerHtml += '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:26px;letter-spacing:1px">' + grupo[1].name + '</span>';
-    headerHtml += '<div class="ejercicio-categoria">' + grupo[1].category + '</div>';
+    headerHtml += '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:nowrap">';
+
+    // Nombres en columna izquierda
+    headerHtml += '<div style="flex:1;min-width:0">';
+    headerHtml += '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">';
+    headerHtml += '<div class="ejercicio-nombre" style="font-size:clamp(24px,5vw,40px)">' + grupo[0].name + '</div>';
+    headerHtml += '<span style="font-size:14px;color:var(--text-muted);font-weight:600">con</span>';
+    headerHtml += '<div class="ejercicio-nombre" style="font-size:clamp(24px,5vw,40px)">' + grupo[1].name + '</div>';
     if (grupo.length > 2) {
       for (var k = 2; k < grupo.length; k++) {
-        headerHtml += '<span style="font-size:12px;color:var(--text-muted)">+</span>';
-        headerHtml += '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:20px">' + grupo[k].name + '</span>';
+        headerHtml += '<span style="font-size:14px;color:var(--text-muted);font-weight:600">+</span>';
+        headerHtml += '<div class="ejercicio-nombre" style="font-size:clamp(20px,4vw,32px)">' + grupo[k].name + '</div>';
       }
     }
     headerHtml += '</div>';
+
+    // Categorías debajo de los nombres
+    headerHtml += '<div style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap">';
+    headerHtml += '<div class="ejercicio-categoria">' + grupo[0].category + '</div>';
+    headerHtml += '<span style="font-size:11px;color:var(--border)">·</span>';
+    headerHtml += '<div class="ejercicio-categoria">' + grupo[1].category + '</div>';
+    if (grupo.length > 2) {
+      for (var k = 2; k < grupo.length; k++) {
+        headerHtml += '<span style="font-size:11px;color:var(--border)">·</span>';
+        headerHtml += '<div class="ejercicio-categoria">' + grupo[k].category + '</div>';
+      }
+    }
+    headerHtml += '</div>';
+    headerHtml += '</div>';
+
+    // Badge superserie a la derecha
+    headerHtml += '<span class="superserie-badge" style="margin-top:0;flex-shrink:0">⚡ SUPERSERIE</span>';
+    headerHtml += '</div>';
+
+    // Subtítulo dinámico "Ahora:"
+    headerHtml += '<div id="superserieAhoraWrap" style="margin-top:14px;padding:10px 14px;background:rgba(232,255,71,0.07);border:1px solid rgba(232,255,71,0.2);border-radius:10px;display:flex;align-items:center;gap:8px">' +
+      '<span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700">Ahora:</span>' +
+      '<span id="superserieAhoraNombre" style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:1px;color:var(--accent)"></span>' +
+      '<span id="superserieAhoraCategoria" class="ejercicio-categoria" style="margin-top:0"></span>' +
+    '</div>';
   } else {
     headerHtml += '<div class="ejercicio-nombre">' + grupo[0].name + '</div>';
     headerHtml += '<div class="ejercicio-categoria">' + grupo[0].category + '</div>';
@@ -434,6 +435,7 @@ function renderGrupo() {
   var accionesHtml =
     '<div class="acciones-guiado">' +
     '<button class="btn-siguiente" id="btnSiguiente">' + (esFin ? '✓ FINALIZAR' : 'SIGUIENTE EJERCICIO →') + '</button>' +
+    (grupoActual > 0 ? '<button class="btn-saltar" id="btnAnterior">← Anterior</button>' : '') +
     '<button class="btn-saltar" id="btnSaltar">Saltar</button>' +
     '</div>';
 
@@ -447,6 +449,9 @@ function renderGrupo() {
   });
 
   document.getElementById('btnSiguiente').addEventListener('click', avanzar);
+  if (grupoActual > 0) {
+    document.getElementById('btnAnterior').addEventListener('click', retroceder);
+  }
   document.getElementById('btnSaltar').addEventListener('click', function(){
     if (confirm('¿Saltar este ejercicio?')) avanzar();
   });
@@ -507,21 +512,85 @@ function completarSerie(ronda, miembro) {
 
 function actualizarVisual() {
   var rows = document.querySelectorAll('.serie-row');
-  var primeraActiva = false;
+  var grupo = grupos[grupoActual];
+  var esSuper = grupo.length > 1;
+
+  if (!esSuper) {
+    var primeraActiva = false;
+    rows.forEach(function(row){
+      var ronda   = parseInt(row.dataset.ronda);
+      var miembro = parseInt(row.dataset.miembro);
+      var comp = seriesCompletadas[grupoActual] &&
+                 seriesCompletadas[grupoActual][miembro] &&
+                 seriesCompletadas[grupoActual][miembro][ronda];
+      row.classList.remove('completada','activa');
+      row.style.display = '';
+      if (comp) {
+        row.classList.add('completada');
+      } else if (!primeraActiva) {
+        row.classList.add('activa');
+        primeraActiva = true;
+        var inp = row.querySelector('input');
+        if (inp) setTimeout(function(){ inp.focus({ preventScroll:true }); }, 50);
+      }
+    });
+    return;
+  }
+
+  // SUPERSERIE: secuencia intercalada ronda0/miembro0 → ronda0/miembro1 → ronda1/miembro0 ...
+  var maxSeries = Math.max.apply(null, grupo.map(function(ej){ return (ej.sets && ej.sets.length) || 3; }));
+  var secuencia = [];
+  for (var r = 0; r < maxSeries; r++) {
+    for (var m = 0; m < grupo.length; m++) {
+      secuencia.push({ ronda: r, miembro: m });
+    }
+  }
+
+  // Primer paso no completado
+  var proximoIdx = -1;
+  for (var i = 0; i < secuencia.length; i++) {
+    var paso = secuencia[i];
+    var comp = seriesCompletadas[grupoActual] &&
+               seriesCompletadas[grupoActual][paso.miembro] &&
+               seriesCompletadas[grupoActual][paso.miembro][paso.ronda];
+    if (!comp) { proximoIdx = i; break; }
+  }
+
+  // Actualizar subtítulo "Ahora:"
+  var ahoraNombre = document.getElementById('superserieAhoraNombre');
+  var ahoraCategoria = document.getElementById('superserieAhoraCategoria');
+  if (ahoraNombre && ahoraCategoria) {
+    if (proximoIdx !== -1) {
+      var ejActivo = grupo[secuencia[proximoIdx].miembro];
+      ahoraNombre.textContent = ejActivo.name;
+      ahoraCategoria.textContent = ejActivo.category;
+    } else {
+      ahoraNombre.textContent = '✓ Todo completado';
+      ahoraCategoria.textContent = '';
+    }
+  }
+
   rows.forEach(function(row){
     var ronda   = parseInt(row.dataset.ronda);
     var miembro = parseInt(row.dataset.miembro);
     var comp = seriesCompletadas[grupoActual] &&
                seriesCompletadas[grupoActual][miembro] &&
                seriesCompletadas[grupoActual][miembro][ronda];
+
     row.classList.remove('completada','activa');
+
     if (comp) {
       row.classList.add('completada');
-    } else if (!primeraActiva) {
+      row.style.display = '';
+    } else if (proximoIdx !== -1 &&
+               secuencia[proximoIdx].ronda === ronda &&
+               secuencia[proximoIdx].miembro === miembro) {
       row.classList.add('activa');
-      primeraActiva = true;
+      row.style.display = '';
       var inp = row.querySelector('input');
       if (inp) setTimeout(function(){ inp.focus({ preventScroll:true }); }, 50);
+    } else {
+      row.style.display = 'none';
     }
   });
 }
@@ -535,6 +604,15 @@ function avanzar() {
     renderGrupo();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+}
+
+function retroceder() {
+  guardarGrupoActual();
+  grupoActual--;
+  // Resetear series completadas del grupo al que volvemos para poder editarlas
+  seriesCompletadas[grupoActual] = grupos[grupoActual].map(function(){ return {}; });
+  renderGrupo();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function guardarGrupoActual() {
@@ -622,15 +700,13 @@ function initModoLibre() {
     var name = document.getElementById('exName').value.trim();
     if (!name){ showToast('⚠ Ingresá el nombre'); return; }
 
-    // Validar que no esté ya guardado en este día (case-insensitive)
     var yaEnDia = ejerciciosLibre.some(function(e){ return e.name.trim().toLowerCase() === name.toLowerCase(); });
     if (yaEnDia){ showToast('⚠ Este ejercicio ya lo agregaste hoy'); return; }
 
-    // Validar que el nombre coincida con uno existente (case-insensitive) → usar el nombre/categoría canónicos
     var existentes = getEjerciciosExistentes();
     var match = existentes.find(function(ex){ return ex.name.trim().toLowerCase() === name.toLowerCase(); });
     if (match) {
-      name = match.name; // normaliza mayúsculas/minúsculas al nombre ya registrado
+      name = match.name;
       document.getElementById('exCategory').value = match.category;
     }
 

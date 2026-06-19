@@ -75,6 +75,111 @@
       color: var(--text-muted);
       font-size: 13px;
     }
+
+    /* ── Cuerpo ── */
+    .medidas-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 480px) {
+      .medidas-form-grid { grid-template-columns: 1fr; }
+    }
+
+    .medida-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .medida-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .medida-btn:hover { border-color: var(--accent); color: var(--text); }
+    .medida-btn.activo {
+      background: rgba(232,255,71,0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .registros-tabla {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+    .registros-tabla th {
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .registros-tabla td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .registros-tabla tr:last-child td { border-bottom: none; }
+    .registros-tabla tr:hover td { background: rgba(232,255,71,0.02); }
+
+    .td-accent { color: var(--accent); font-weight: 700; font-family: 'Bebas Neue', sans-serif; font-size: 16px; }
+    .td-muted { color: var(--text-muted); font-size: 11px; }
+
+    .btn-del-registro {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-del-registro:hover { color: var(--red); background: rgba(248,113,113,0.1); }
+    .btn-del-registro svg { pointer-events: none; }
+
+    .ultimo-registro {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .ultimo-stat {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .ultimo-stat .u-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .ultimo-stat .u-lbl {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-top: 3px;
+    }
   </style>
 </head>
 <body>
@@ -88,10 +193,10 @@
     <div class="logo">MIS<span><br>DATOS</span></div>
   </header>
 
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('musculos')">Músculos</button>
-    <button class="tab-btn" onclick="showTab('progreso')">Progreso por ejercicio</button>
+    <button class="tab-btn active" onclick="showTab('musculos', this)">Músculos</button>
+    <button class="tab-btn" onclick="showTab('progreso', this)">Progreso por ejercicio</button>
+    <button class="tab-btn" onclick="showTab('cuerpo', this)">Peso y medidas</button>
   </div>
 
   <!-- TAB 1: MÚSCULOS -->
@@ -121,44 +226,141 @@
     </div>
   </div>
 
+  <!-- TAB 3: PESO Y MEDIDAS -->
+  <div class="tab-section" id="tab-cuerpo">
+
+    <!-- Card: Peso corporal -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-title">Peso corporal</div>
+      <div class="form-group">
+        <label>Peso (kg)</label>
+        <input type="number" id="mPeso" placeholder="Ej: 78.5" step="0.1" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Notas (opcional)</label>
+        <input type="text" id="mNotasPeso" placeholder="Ej: En ayunas..."/>
+      </div>
+      <button class="btn btn-primary" id="btnGuardarPeso">GUARDAR PESO</button>
+    </div>
+
+    <!-- Card: Medidas corporales -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-title">Medidas corporales</div>
+      <div class="medidas-form-grid">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Cintura (cm)</label>
+          <input type="number" id="mCintura" placeholder="Ej: 82" step="0.5" min="0"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Pecho (cm)</label>
+          <input type="number" id="mPecho" placeholder="Ej: 100" step="0.5" min="0"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Brazo (cm)</label>
+          <input type="number" id="mBrazo" placeholder="Ej: 36" step="0.5" min="0"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Pierna (cm)</label>
+          <input type="number" id="mPierna" placeholder="Ej: 58" step="0.5" min="0"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Cadera (cm)</label>
+          <input type="number" id="mCadera" placeholder="Ej: 95" step="0.5" min="0"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label>Notas (opcional)</label>
+        <input type="text" id="mNotas" placeholder="Ej: Después de entrenar..."/>
+      </div>
+      <button class="btn btn-primary" id="btnGuardarMedida">GUARDAR MEDIDAS</button>
+    </div>
+
+    <!-- Último registro -->
+    <div class="card" style="margin-bottom:16px" id="cardUltimo" style="display:none">
+      <div class="section-title">Último registro</div>
+      <div class="ultimo-registro" id="ultimoRegistro"></div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-title">Evolución</div>
+      <div class="medida-selector" id="medidaSelector"></div>
+      <div class="chart-container">
+        <canvas id="cuerpoChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="card">
+      <div class="section-title">Historial</div>
+      <div id="tablaRegistros"></div>
+    </div>
+
+  </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
   var STORAGE_KEY = 'savetraining_v1';
-  var data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var CUERPO_KEY  = 'savetraining_cuerpo';
 
-  var muscleChartInstance = null;
+  var data        = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  var registrosCuerpo = JSON.parse(localStorage.getItem(CUERPO_KEY) || '[]');
+
+  var muscleChartInstance   = null;
   var progresoChartInstance = null;
+  var cuerpoChartInstance   = null;
+  var medidaActiva = 'peso';
 
-  // ---- TABS ----
-  function showTab(name) {
-    document.querySelectorAll('.tab-section').forEach(function(s) { s.classList.remove('active'); });
-    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-    document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
+  var MEDIDAS = [
+    { key: 'peso',    label: 'Peso',    unit: 'kg', inputId: 'mPeso'    },
+    { key: 'cintura', label: 'Cintura', unit: 'cm', inputId: 'mCintura' },
+    { key: 'pecho',   label: 'Pecho',   unit: 'cm', inputId: 'mPecho'   },
+    { key: 'brazo',   label: 'Brazo',   unit: 'cm', inputId: 'mBrazo'   },
+    { key: 'pierna',  label: 'Pierna',  unit: 'cm', inputId: 'mPierna'  },
+    { key: 'cadera',  label: 'Cadera',  unit: 'cm', inputId: 'mCadera'  },
+  ];
+
+  var TRASH_SVG =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px">' +
+    '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>' +
+    '<path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 2500);
   }
 
-  // ---- TAB 1: MÚSCULOS ----
-  var categorias = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Otro'];
+  function saveCuerpo() {
+    localStorage.setItem(CUERPO_KEY, JSON.stringify(registrosCuerpo));
+  }
+
+  /* ── TABS ── */
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-section').forEach(function(s){ s.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  /* ── TAB 1: MÚSCULOS ── */
+  var categorias = ['Pecho','Espalda','Piernas','Hombros','Bíceps','Tríceps','Core','Cardio','Otro'];
 
   function calcMusculos() {
     var counts = {};
-    categorias.forEach(function(c) { counts[c] = 0; });
-
-    Object.keys(data).forEach(function(dateKey) {
+    categorias.forEach(function(c){ counts[c] = 0; });
+    Object.keys(data).forEach(function(dateKey){
       var day = data[dateKey];
       if (!day.trained || !day.exercises) return;
-
       var categoriasDelDia = {};
-      day.exercises.forEach(function(ex) {
+      day.exercises.forEach(function(ex){
         var cat = ex.category;
-        var key = categorias.find(function(c) {
-          return c.toLowerCase() === (cat || '').toLowerCase();
-        }) || cat;
+        var key = categorias.find(function(c){ return c.toLowerCase() === (cat||'').toLowerCase(); }) || cat;
         categoriasDelDia[key] = true;
       });
-
-      Object.keys(categoriasDelDia).forEach(function(key) {
+      Object.keys(categoriasDelDia).forEach(function(key){
         if (counts[key] !== undefined) counts[key]++;
         else counts[key] = 1;
       });
@@ -170,59 +372,35 @@
     var counts = calcMusculos();
     var grid = document.getElementById('muscleGrid');
     grid.innerHTML = '';
-
-    categorias.forEach(function(cat) {
+    categorias.forEach(function(cat){
       var n = counts[cat] || 0;
       var div = document.createElement('div');
       div.className = 'muscle-card';
-      div.innerHTML =
-        '<div class="muscle-count">' + n + '</div>' +
-        '<div class="muscle-name">' + cat + '</div>';
+      div.innerHTML = '<div class="muscle-count">' + n + '</div><div class="muscle-name">' + cat + '</div>';
       grid.appendChild(div);
     });
-
-    // Gráfico de barras
     var ctx = document.getElementById('muscleChart').getContext('2d');
     if (muscleChartInstance) muscleChartInstance.destroy();
-
     muscleChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: categorias,
-        datasets: [{
-          label: 'Ejercicios realizados',
-          data: categorias.map(function(c) { return counts[c] || 0; }),
-          backgroundColor: 'rgba(232,255,71,0.25)',
-          borderColor: '#e8ff47',
-          borderWidth: 2,
-          borderRadius: 6,
-        }]
+        datasets: [{ label: 'Ejercicios realizados', data: categorias.map(function(c){ return counts[c]||0; }), backgroundColor: 'rgba(232,255,71,0.25)', borderColor: '#e8ff47', borderWidth: 2, borderRadius: 6 }]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: '#6b6b7a', font: { size: 11 } }, grid: { color: '#2a2a32' } },
-          y: { ticks: { color: '#6b6b7a', stepSize: 1 }, grid: { color: '#2a2a32' }, beginAtZero: true }
-        }
-      }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#6b6b7a', font: { size: 11 } }, grid: { color: '#2a2a32' } }, y: { ticks: { color: '#6b6b7a', stepSize: 1 }, grid: { color: '#2a2a32' }, beginAtZero: true } } }
     });
   }
 
-  // ---- TAB 2: PROGRESO POR EJERCICIO ----
+  /* ── TAB 2: PROGRESO ── */
   function getEjercicios() {
-    var map = {}; // nombre -> [{fecha, maxPeso}]
-
-    Object.keys(data).sort().forEach(function(dateKey) {
+    var map = {};
+    Object.keys(data).sort().forEach(function(dateKey){
       var day = data[dateKey];
       if (!day.trained || !day.exercises) return;
-      day.exercises.forEach(function(ex) {
+      day.exercises.forEach(function(ex){
         var nombre = ex.name.trim();
         if (!nombre) return;
-        var maxPeso = Math.max.apply(null, ex.sets.map(function(s) {
-          return parseFloat(s.weight) || 0;
-        }));
+        var maxPeso = Math.max.apply(null, ex.sets.map(function(s){ return parseFloat(s.weight)||0; }));
         if (!map[nombre]) map[nombre] = [];
         map[nombre].push({ fecha: dateKey, peso: maxPeso });
       });
@@ -239,10 +417,9 @@
     var map = getEjercicios();
     var select = document.getElementById('ejercicioSelect');
     select.innerHTML = '<option value="">-- Elegí un ejercicio --</option>';
-    Object.keys(map).sort().forEach(function(nombre) {
+    Object.keys(map).sort().forEach(function(nombre){
       var opt = document.createElement('option');
-      opt.value = nombre;
-      opt.textContent = nombre;
+      opt.value = nombre; opt.textContent = nombre;
       select.appendChild(opt);
     });
   }
@@ -250,38 +427,122 @@
   function renderProgreso(nombre) {
     var map = getEjercicios();
     var content = document.getElementById('progresoContent');
-
-    if (!nombre || !map[nombre]) {
-      content.innerHTML = '<div class="no-data">Seleccioná un ejercicio para ver su progreso.</div>';
-      return;
-    }
-
+    if (!nombre || !map[nombre]) { content.innerHTML = '<div class="no-data">Seleccioná un ejercicio para ver su progreso.</div>'; return; }
     var registros = map[nombre];
-
-    if (registros.length < 2) {
-      content.innerHTML = '<div class="no-data">Necesitás al menos 2 registros de este ejercicio para ver el progreso.</div>';
-      return;
-    }
-
+    if (registros.length < 2) { content.innerHTML = '<div class="no-data">Necesitás al menos 2 registros de este ejercicio para ver el progreso.</div>'; return; }
     content.innerHTML = '<div class="chart-container"><canvas id="progresoChart"></canvas></div>';
-
     var ctx = document.getElementById('progresoChart').getContext('2d');
     if (progresoChartInstance) progresoChartInstance.destroy();
-
     progresoChartInstance = new Chart(ctx, {
       type: 'line',
+      data: { labels: registros.map(function(r){ return formatFecha(r.fecha); }), datasets: [{ label: 'Peso máximo (kg)', data: registros.map(function(r){ return r.peso; }), borderColor: '#e8ff47', backgroundColor: 'rgba(232,255,71,0.08)', borderWidth: 2.5, pointBackgroundColor: '#e8ff47', pointRadius: 5, tension: 0.3, fill: true }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx){ return ctx.parsed.y + ' kg'; } } } }, scales: { x: { ticks: { color: '#6b6b7a' }, grid: { color: '#2a2a32' } }, y: { ticks: { color: '#6b6b7a' }, grid: { color: '#2a2a32' }, beginAtZero: false } } }
+    });
+  }
+
+  document.getElementById('ejercicioSelect').addEventListener('change', function(){ renderProgreso(this.value); });
+
+  /* ── TAB 3: CUERPO ── */
+  function formatTs(ts) {
+    var d = new Date(ts);
+    return d.getDate().toString().padStart(2,'0') + '/' +
+           (d.getMonth()+1).toString().padStart(2,'0') + '/' +
+           d.getFullYear() + ' ' +
+           d.getHours().toString().padStart(2,'0') + ':' +
+           d.getMinutes().toString().padStart(2,'0');
+  }
+
+  var MEDIDAS_CORPORALES = [
+    { key: 'cintura', label: 'Cintura', unit: 'cm', inputId: 'mCintura' },
+    { key: 'pecho',   label: 'Pecho',   unit: 'cm', inputId: 'mPecho'   },
+    { key: 'brazo',   label: 'Brazo',   unit: 'cm', inputId: 'mBrazo'   },
+    { key: 'pierna',  label: 'Pierna',  unit: 'cm', inputId: 'mPierna'  },
+    { key: 'cadera',  label: 'Cadera',  unit: 'cm', inputId: 'mCadera'  },
+  ];
+
+  document.getElementById('btnGuardarPeso').addEventListener('click', function(){
+    var val = parseFloat(document.getElementById('mPeso').value);
+    if (isNaN(val) || val <= 0){ showToast('⚠ Ingresá un peso válido'); return; }
+    var entrada = { ts: Date.now(), peso: val };
+    var notas = document.getElementById('mNotasPeso').value.trim();
+    if (notas) entrada.notas = notas;
+    registrosCuerpo.push(entrada);
+    saveCuerpo();
+    document.getElementById('mPeso').value = '';
+    document.getElementById('mNotasPeso').value = '';
+    renderCuerpo();
+    showToast('✓ Peso guardado');
+  });
+
+  document.getElementById('btnGuardarMedida').addEventListener('click', function(){
+    var entrada = { ts: Date.now() };
+    var hayAlgo = false;
+    MEDIDAS_CORPORALES.forEach(function(m){
+      var val = parseFloat(document.getElementById(m.inputId).value);
+      if (!isNaN(val) && val > 0) { entrada[m.key] = val; hayAlgo = true; }
+    });
+    if (!hayAlgo){ showToast('⚠ Ingresá al menos una medida'); return; }
+    var notas = document.getElementById('mNotas').value.trim();
+    if (notas) entrada.notas = notas;
+    registrosCuerpo.push(entrada);
+    saveCuerpo();
+    MEDIDAS_CORPORALES.forEach(function(m){ document.getElementById(m.inputId).value = ''; });
+    document.getElementById('mNotas').value = '';
+    renderCuerpo();
+    showToast('✓ Medidas guardadas');
+  });
+
+  function renderMedidaSelector() {
+    var bar = document.getElementById('medidaSelector');
+    bar.innerHTML = '';
+    MEDIDAS.forEach(function(m){
+      // Solo mostrar botones para medidas que tienen al menos un registro
+      var tieneData = registrosCuerpo.some(function(r){ return r[m.key] !== undefined; });
+      if (!tieneData) return;
+      var btn = document.createElement('button');
+      btn.className = 'medida-btn' + (medidaActiva === m.key ? ' activo' : '');
+      btn.textContent = m.label;
+      btn.addEventListener('click', function(){
+        medidaActiva = m.key;
+        renderMedidaSelector();
+        renderCuerpoChart();
+      });
+      bar.appendChild(btn);
+    });
+  }
+
+  function renderCuerpoChart() {
+    var medida = MEDIDAS.find(function(m){ return m.key === medidaActiva; });
+    var registrosFiltrados = registrosCuerpo
+      .filter(function(r){ return r[medidaActiva] !== undefined; })
+      .sort(function(a,b){ return a.ts - b.ts; });
+
+    var ctx = document.getElementById('cuerpoChart').getContext('2d');
+    if (cuerpoChartInstance) cuerpoChartInstance.destroy();
+
+    if (registrosFiltrados.length < 2) {
+      cuerpoChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+      return;
+    }
+
+    cuerpoChartInstance = new Chart(ctx, {
+      type: 'line',
       data: {
-        labels: registros.map(function(r) { return formatFecha(r.fecha); }),
+        labels: registrosFiltrados.map(function(r){ return formatTs(r.ts).slice(0,10); }),
         datasets: [{
-          label: 'Peso máximo (kg)',
-          data: registros.map(function(r) { return r.peso; }),
+          label: medida.label + ' (' + medida.unit + ')',
+          data: registrosFiltrados.map(function(r){ return r[medidaActiva]; }),
           borderColor: '#e8ff47',
           backgroundColor: 'rgba(232,255,71,0.08)',
           borderWidth: 2.5,
           pointBackgroundColor: '#e8ff47',
           pointRadius: 5,
           tension: 0.3,
-          fill: true,
+          fill: true
         }]
       },
       options: {
@@ -289,27 +550,84 @@
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(ctx) { return ctx.parsed.y + ' kg'; }
-            }
-          }
+          tooltip: { callbacks: { label: function(ctx){ return ctx.parsed.y + ' ' + medida.unit; } } }
         },
         scales: {
-          x: { ticks: { color: '#6b6b7a' }, grid: { color: '#2a2a32' } },
+          x: { ticks: { color: '#6b6b7a', font: { size: 11 } }, grid: { color: '#2a2a32' } },
           y: { ticks: { color: '#6b6b7a' }, grid: { color: '#2a2a32' }, beginAtZero: false }
         }
       }
     });
   }
 
-  document.getElementById('ejercicioSelect').addEventListener('change', function() {
-    renderProgreso(this.value);
-  });
+  function renderUltimoRegistro() {
+    var card = document.getElementById('cardUltimo');
+    if (!registrosCuerpo.length) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    var ultimo = registrosCuerpo[registrosCuerpo.length - 1];
+    var container = document.getElementById('ultimoRegistro');
+    container.innerHTML = '';
+    MEDIDAS.forEach(function(m){
+      if (ultimo[m.key] === undefined) return;
+      var div = document.createElement('div');
+      div.className = 'ultimo-stat';
+      div.innerHTML = '<div class="u-val">' + ultimo[m.key] + '</div><div class="u-lbl">' + m.label + ' ' + m.unit + '</div>';
+      container.appendChild(div);
+    });
+  }
 
-  // INIT
+  function renderTablaRegistros() {
+    var container = document.getElementById('tablaRegistros');
+    if (!registrosCuerpo.length) {
+      container.innerHTML = '<div class="no-data">Todavía no registraste ninguna medida.</div>';
+      return;
+    }
+
+    var sorted = registrosCuerpo.slice().sort(function(a,b){ return b.ts - a.ts; });
+
+    var html = '<table class="registros-tabla"><thead><tr>' +
+      '<th>Fecha</th>' +
+      MEDIDAS.map(function(m){ return '<th>' + m.label + '</th>'; }).join('') +
+      '<th>Notas</th><th></th>' +
+      '</tr></thead><tbody>';
+
+    sorted.forEach(function(r){
+      html += '<tr>' +
+        '<td class="td-muted">' + formatTs(r.ts) + '</td>' +
+        MEDIDAS.map(function(m){
+          return '<td class="td-accent">' + (r[m.key] !== undefined ? r[m.key] + '<span style="font-size:10px;color:var(--text-muted);font-family:\'DM Sans\',sans-serif;font-weight:400"> ' + m.unit + '</span>' : '<span style="color:var(--border)">—</span>') + '</td>';
+        }).join('') +
+        '<td class="td-muted">' + (r.notas || '') + '</td>' +
+        '<td><button class="btn-del-registro" data-ts="' + r.ts + '" title="Eliminar">' + TRASH_SVG + '</button></td>' +
+        '</tr>';
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.btn-del-registro').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var ts = parseInt(btn.dataset.ts);
+        if (!confirm('¿Eliminar este registro?')) return;
+        registrosCuerpo = registrosCuerpo.filter(function(r){ return r.ts !== ts; });
+        saveCuerpo();
+        renderCuerpo();
+        showToast('Registro eliminado');
+      });
+    });
+  }
+
+  function renderCuerpo() {
+    renderUltimoRegistro();
+    renderMedidaSelector();
+    renderCuerpoChart();
+    renderTablaRegistros();
+  }
+
+  /* ── INIT ── */
   renderMusculos();
   renderProgresoSelect();
+  renderCuerpo();
 </script>
 </body>
 </html>
